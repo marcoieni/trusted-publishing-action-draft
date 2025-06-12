@@ -2,6 +2,32 @@
 
 Get a temporary access token that you can use to interact with crates.io.
 
+
+## Usage
+
+```yaml
+name: Login to crates.io
+on:
+  tag:
+    - 'v*'
+
+jobs:
+    publish:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Retrieve crates.io token
+      uses: rust-lang/trusted-publishing-action@v1.0.0
+      id: get-token
+
+    - name: Login to crates.io
+      run: cargo login
+      env:
+        CARGO_REGISTRY_TOKEN: ${{ steps.get-token.outputs.token }}
+    ```
+
 ## TODO
 
 - [ ] automate tag update (e.g. v1 updates when v1.0.1 is released)
