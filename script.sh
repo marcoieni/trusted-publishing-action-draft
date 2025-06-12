@@ -29,7 +29,7 @@ fi
 echo "retrieved jwt"
 
 # Send the request to the endpoint with JWT in payload
-token_response=$(curl -X PUT $REGISTRY_URL/api/v1/trusted_publishing/tokens \
+token_response=$(curl -X PUT "$REGISTRY_URL"/api/v1/trusted_publishing/tokens \
   -H "Content-Type: application/json" \
   -d "{\"jwt\": \"$jwt_token\"}")
 echo "sent request to $REGISTRY_URL/api/v1/trusted_publishing/tokens"
@@ -49,4 +49,4 @@ fi
 echo "retrieved token"
 
 # Store the token in GitHub Actions output
-echo "token=$token" >> $GITHUB_OUTPUT
+echo "token=$token" >> "$GITHUB_OUTPUT"

@@ -1,4 +1,4 @@
-name: Test
+name: CI
 
 on:
   push:
@@ -15,6 +15,17 @@ permissions:
   id-token: write
 
 jobs:
+  ci:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Shellcheck
+        run: |
+          # Run shellcheck on the action script
+          shellcheck "script.sh" --shell=dash
+
   test:
     runs-on: ubuntu-24.04
     steps:

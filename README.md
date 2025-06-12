@@ -42,4 +42,3 @@ jobs:
 - [ ] add retry logic?
 - [ ] write more docs or link to more docs
 - [ ] add license
-- [ ] shellcheck in CI
