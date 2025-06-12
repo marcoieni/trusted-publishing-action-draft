@@ -17,7 +17,7 @@
         "@actions/core": "^1.11.1"
     },
     "license": "MIT",
-    "type": "module",
+    "type": "commonjs",
     "bugs": {
         "url": "https://github.com/marcoieni/trusted-publishing-action-draft/issues"
     },
