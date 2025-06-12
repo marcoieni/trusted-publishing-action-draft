@@ -11,6 +11,7 @@ use tokio;
 
 #[derive(Deserialize)]
 struct TokenRequest {
+    #[serde(rename = "jwt")]
     _jwt: String,
 }
 
