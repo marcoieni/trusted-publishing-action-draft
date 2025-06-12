@@ -27,6 +27,9 @@ token_response=$(curl -X PUT $REGISTRY_URL/api/v1/trusted_publishing/tokens \
   -d "{\"jwt\": \"$jwt_token\"}")
 echo "sent request to $REGISTRY_URL/api/v1/trusted_publishing/tokens"
 
+# todo: remove this
+echo $token_response
+
 # Extract the token from the JSON response `{ "token": "string" }`.
 token=$(echo "$token_response" | jq -r '.token')
 echo "retrieved token"
