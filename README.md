@@ -23,14 +23,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Retrieve crates.io token
-      uses: rust-lang/trusted-publishing-action@v1.0.0
-      id: get-token
+    - name: Authenticate with crates.io
+      id: auth
+      uses: rust-lang/crates-io-auth-action@v1
 
-    - name: Login to crates.io
-      run: cargo login
+    - name: Publish to crates.io
+      run: cargo publish
       env:
-        CARGO_REGISTRY_TOKEN: ${{ steps.get-token.outputs.token }}
+        CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 ```
 
 ## TODO
