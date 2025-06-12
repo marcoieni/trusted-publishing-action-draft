@@ -20,8 +20,9 @@ jobs:
         run: |
           # Build the mock server before running it so that
           # `cargo run` finds the binary and we can run it in the background
-          cargo build --manifest-path=mock/Cargo.toml
-          cargo run --manifest-path=mock/Cargo.toml &
+          manifest_path="--manifest-path=mock/Cargo.toml"
+          cargo build $manifest_path
+          cargo run   $manifest_path &
 
           # Wait for server to be ready
           retry_count=0
