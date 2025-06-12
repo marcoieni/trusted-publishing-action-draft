@@ -10,9 +10,6 @@ on:
     paths-ignore:
       - "**.md"
 
-# Required for OpenID Connect token retrieval
-permissions:
-  id-token: write
 
 jobs:
   ci:
@@ -20,6 +17,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Shellcheck
         run: |
@@ -28,9 +27,16 @@ jobs:
 
   test:
     runs-on: ubuntu-24.04
+
+    # Required for OpenID Connect token retrieval
+    permissions:
+      id-token: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Start mock crates.io server
         run: |
