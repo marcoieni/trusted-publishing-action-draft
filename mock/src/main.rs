@@ -6,15 +6,21 @@ use axum::{
     response::Json,
     routing::{get, put},
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tokio;
+
+#[derive(Deserialize)]
+struct TokenRequest {
+    #[serde(rename = "jwt")]
+    _jwt: String,
+}
 
 #[derive(Serialize)]
 struct TokenResponse {
     token: String,
 }
 
-async fn get_token() -> Result<Json<TokenResponse>, StatusCode> {
+async fn get_token(Json(_payload): Json<TokenRequest>) -> Result<Json<TokenResponse>, StatusCode> {
     let response = TokenResponse {
         token: "mock-token".to_string(),
     };
