@@ -31,7 +31,7 @@ jobs:
       run: cargo login
       env:
         CARGO_REGISTRY_TOKEN: ${{ steps.get-token.outputs.token }}
-    ```
+```
 
 ## TODO
 
