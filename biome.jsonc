@@ -3,5 +3,8 @@
         "indentStyle": "space", // default is `tab`
         "indentWidth": 4, // default is `2`
         "lineWidth": 100 // default is `80`
+    },
+    "files": {
+        "ignore": ["package-lock.json"]
     }
 }
