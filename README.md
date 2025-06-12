@@ -42,4 +42,6 @@ jobs:
 - [ ] add retry logic?
 - [ ] write more docs or link to more docs
 - [ ] add license
-- [ ] set output as sensitive if possible. so that when injected with `env` it is not printed in the logs
+- [ ] test that the token output is set as sensitive, if possible
+- [ ] ensure that the dist files are the same as CI
+- [ ] simplify the rollup configuration

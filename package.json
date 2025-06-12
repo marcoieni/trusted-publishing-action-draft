@@ -1,0 +1,32 @@
+{
+    "name": "trusted-publishing-action-draft",
+    "version": "0.0.0",
+    "description": "Get a temporary access token that you can use to interact with crates.io.",
+    "private": true,
+    "scripts": {
+        "package": "npx rollup --config rollup.config.js",
+        "check": "npx @biomejs/biome check"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/marcoieni/trusted-publishing-action-draft.git"
+    },
+    "dependencies": {
+        "@actions/core": "^1.11.1"
+    },
+    "license": "MIT",
+    "type": "module",
+    "bugs": {
+        "url": "https://github.com/marcoieni/trusted-publishing-action-draft/issues"
+    },
+    "homepage": "https://github.com/marcoieni/trusted-publishing-action-draft#readme",
+    "devDependencies": {
+        "rollup": "4.43.0",
+        "@rollup/plugin-commonjs": "^28.0.3",
+        "@rollup/plugin-node-resolve": "^16.0.1",
+        "@biomejs/biome": "1.9.4"
+    }
+}
