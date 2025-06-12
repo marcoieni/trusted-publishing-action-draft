@@ -6,19 +6,19 @@ Get a temporary access token that you can use to interact with crates.io.
 ## Usage
 
 ```yaml
-name: Login to crates.io
+name: Publish Crate
 
 on:
-  # customize the event that triggers this action
-  push:
-
-# Required for OpenID Connect token retrieval
-permissions:
-  id-token: write
+  tag:
 
 jobs:
-    publish:
-    runs-on: ubuntu-24.04
+  publish:
+    runs-on: ubuntu-latest
+
+    # Required for OpenID Connect token retrieval
+    permissions:
+      id-token: write
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
