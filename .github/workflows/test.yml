@@ -25,6 +25,8 @@ jobs:
       - name: Run trusted publishing action
         id: trusted-publishing
         uses: ./ # Uses the action in the root directory
+        with:
+          endpoint: "http://localhost:3000" # Mock server endpoint
       - name: Assert output
         env:
           TOKEN: ${{ steps.trusted-publishing.outputs.token }}
