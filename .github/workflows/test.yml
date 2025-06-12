@@ -16,6 +16,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Start mock crates.io server
         run: |
           # Build the mock server before running it so that
@@ -37,12 +38,14 @@ jobs:
             fi
           done
           echo "Mock server is ready"
+
       - name: Run trusted publishing action
         id: trusted-publishing
         uses: ./ # Uses the action in the root directory
         with:
           endpoint: "http://localhost:3000" # Mock server endpoint
-      - name: Assert output
+
+      - name: Assert action output
         env:
           TOKEN: ${{ steps.trusted-publishing.outputs.token }}
         run: |
