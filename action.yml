@@ -3,13 +3,13 @@ author: "WIP"
 description: "WIP"
 inputs:
   endpoint:
-    description: "WIP"
+    description: "cargo registry endpoint, defaults to crates.io"
     required: false
-    default: "http://localhost:3000"
+    default: "https://crates.io"
     type: string
 outputs:
   token:
-    description: "WIP"
+    description: "The temporary access token you can use to login with cargo"
     value: ${{ steps.request.outputs.token }}
 branding:
   icon: "zap"
@@ -21,6 +21,11 @@ runs:
       id: request
       shell: bash
       run: |
-        response=$(curl -s -X PUT ${{ inputs.endpoint }}/api/v1/trusted_publishing/tokens)
+        # Send the request to the endpoint to retrieve the token.
+        response=$(curl -X PUT ${{ inputs.endpoint }}/api/v1/trusted_publishing/tokens)
+
+        # Extract the token from the JSON response `{ "token": "string" }`.
         token=$(echo "$response" | jq -r '.token')
+
+        # Store the token in GitHub Actions output
         echo "token=$token" >> $GITHUB_OUTPUT
