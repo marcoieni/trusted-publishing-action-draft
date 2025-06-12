@@ -17,3 +17,4 @@ branding:
 runs:
   using: "node20"
   main: "src/main.js"
+  post: "src/post.js"

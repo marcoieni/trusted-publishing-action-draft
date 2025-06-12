@@ -23,8 +23,8 @@ jobs:
 
       - name: Shellcheck
         run: |
-          # Run shellcheck on the action script
-          shellcheck "script.sh" --shell=dash
+          # Check format and lint
+          npm run check
 
   zizmor:
     runs-on: ubuntu-24.04
