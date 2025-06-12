@@ -2,6 +2,11 @@ name: "trusted-publishing"
 author: "WIP"
 description: "WIP"
 inputs:
+  endpoint:
+    description: "WIP"
+    required: false
+    default: "http://localhost:3000"
+    type: string
 outputs:
   token:
     description: "WIP"
@@ -16,6 +21,6 @@ runs:
       id: request
       shell: bash
       run: |
-        response=$(curl -s -X PUT http://localhost:3000/api/v1/trusted_publishing/tokens)
+        response=$(curl -s -X PUT ${{ inputs.endpoint }}/api/v1/trusted_publishing/tokens)
         token=$(echo "$response" | jq -r '.token')
         echo "token=$token" >> $GITHUB_OUTPUT
