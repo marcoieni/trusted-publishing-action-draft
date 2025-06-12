@@ -22,6 +22,5 @@ runs:
       shell: bash
       env:
         REGISTRY_URL: ${{ inputs.url }}
-        GITHUB_ACTION_PATH: ${{ github.action_path }}
       run: |
-        "$GITHUB_ACTION_PATH/script.sh"
+        "${{ github.action_path }}/script.sh"
