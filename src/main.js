@@ -72,12 +72,14 @@ function setTokenOutputs(token, registryUrl) {
 
 // Extract audience from registry URL by removing `https://` or `http://`
 function getAudienceFromUrl(url) {
-    const audience = registryUrl.replace(/^https?:\/\//, "");
+    const audience = url.replace(/^https?:\/\//, "");
 
     if (audience.startsWith("http://") || audience.startsWith("https://")) {
         core.setFailed("Bug: The audience should not include the protocol (http:// or https://).");
         return;
     }
+
+    return audience;
 }
 
 async function run() {
