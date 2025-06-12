@@ -4,6 +4,7 @@
     "description": "Get a temporary access token that you can use to interact with crates.io.",
     "private": true,
     "scripts": {
+        "package": "npx rollup --config rollup.config.js",
         "check": "npx @biomejs/biome check"
     },
     "engines": {
@@ -17,12 +18,14 @@
         "@actions/core": "^1.11.1"
     },
     "license": "MIT",
-    "type": "commonjs",
+    "type": "module",
     "bugs": {
         "url": "https://github.com/marcoieni/trusted-publishing-action-draft/issues"
     },
     "homepage": "https://github.com/marcoieni/trusted-publishing-action-draft#readme",
     "devDependencies": {
+        "rollup": "^4.41.1",
         "@biomejs/biome": "1.9.4"
+
     }
 }

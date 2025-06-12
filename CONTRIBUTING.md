@@ -10,6 +10,11 @@ To format and fix lints, run:
 npx @biomejs/biome check --write
 ```
 
+## Packaging
+
+To avoid committing the `node_modules` directory, we use `npm run package` to compile the action
+into a single file.
+
 ## FAQ
 
 ### Why javascript?
@@ -30,4 +35,4 @@ So we opted for a JavaScript Action.
 
 ### Why not typescript?
 
-The code is simple enough that we can avoid the complexity of compiling TypeScript to JavaScript.
+The code is simple enough that we can avoid the complexity of TypeScript.
