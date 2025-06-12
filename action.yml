@@ -1,6 +1,6 @@
 name: "trusted-publishing"
 author: "WIP"
-description: "WIP"
+description: "Retrieve a temporary access token for trusted publishing with crates.io."
 inputs:
   endpoint:
     description: "cargo registry endpoint, defaults to crates.io"
