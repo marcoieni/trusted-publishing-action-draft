@@ -43,3 +43,4 @@ jobs:
 - [ ] write more docs or link to more docs
 - [ ] add license
 - [ ] zizmor should fail if security issue is detected
+- [ ] set output as sensitive if possible. so that when injected with `env` it is not printed in the logs
