@@ -19,9 +19,20 @@ jobs:
       - name: Start mock crates.io server
         run: |
           cargo run --manifest-path=mock/Cargo.toml &
-      - name: Start mock crates.io server
-        run: |
-          cargo run --manifest-path=mock/Cargo.toml &
+
+          # Wait for server to be ready
+          retry_count=0
+          max_retries=3
+          until curl -s http://localhost:3000/health > /dev/null 2>&1; do
+            echo "Waiting for mock server to start... (attempt $((retry_count + 1))/$max_retries)"
+            sleep 2
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -ge $max_retries ]; then
+              echo "Mock server failed to start after $max_retries attempts"
+              exit 1
+            fi
+          done
+          echo "Mock server is ready"
       - name: Run trusted publishing action
         id: trusted-publishing
         uses: ./ # Uses the action in the root directory
