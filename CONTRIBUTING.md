@@ -1,5 +1,15 @@
 # Contributing
 
+## Format and lint
+
+We use [Biome](https://biomejs.dev/) for formatting and linting.
+
+To format and fix lints, run:
+
+```bash
+npx @biomejs/biome check --write
+```
+
 ## FAQ
 
 ### Why javascript?
