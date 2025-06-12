@@ -39,7 +39,7 @@ token=$(echo "$token_response" | jq -r '.token')
 
 # Check if token is empty or null
 if [ -z "$token" ] || [ "$token" = "null" ]; then
-  echo "Error: Failed to retrieve JWT token from GitHub Actions."
+  echo "Error: Failed to retrieve token from Cargo registry."
   errors="$(echo "$token_response" | jq -r '.errors')"
   echo "Errors: $errors"
   exit 1
