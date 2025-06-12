@@ -47,7 +47,7 @@ jobs:
         id: trusted-publishing
         uses: ./ # Uses the action in the root directory
         with:
-          endpoint: "http://localhost:3000" # Mock server endpoint
+          url: "http://localhost:3000" # Mock server url
 
       - name: Assert action output
         env:

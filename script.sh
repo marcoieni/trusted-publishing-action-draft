@@ -9,7 +9,7 @@ if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
   exit 1
 fi
 
-audience=$(echo "$REGISTRY_ENDPOINT" | sed 's|^https\?://||')
+audience=$(echo "$REGISTRY_URL" | sed 's|^https\?://||')
 
 # Get the GitHub Actions JWT token
 echo "Retrieving GitHub Actions JWT token from $ACTIONS_ID_TOKEN_REQUEST_URL"
@@ -22,10 +22,10 @@ jwt_token=$(echo "$jwt_response" | jq -r '.value')
 echo "retrieved jwt"
 
 # Send the request to the endpoint with JWT in payload
-token_response=$(curl -X PUT $REGISTRY_ENDPOINT/api/v1/trusted_publishing/tokens \
+token_response=$(curl -X PUT $REGISTRY_URL/api/v1/trusted_publishing/tokens \
   -H "Content-Type: application/json" \
   -d "{\"jwt\": \"$jwt_token\"}")
-echo "sent request to $REGISTRY_ENDPOINT/api/v1/trusted_publishing/tokens"
+echo "sent request to $REGISTRY_URL/api/v1/trusted_publishing/tokens"
 
 # Extract the token from the JSON response `{ "token": "string" }`.
 token=$(echo "$token_response" | jq -r '.token')

@@ -2,8 +2,8 @@ name: "trusted-publishing"
 author: "WIP"
 description: "Retrieve a temporary access token for trusted publishing with crates.io."
 inputs:
-  endpoint:
-    description: "cargo registry endpoint, defaults to crates.io"
+  url:
+    description: "cargo registry url, defaults to crates.io"
     required: false
     default: "https://crates.io"
     type: string
@@ -21,6 +21,6 @@ runs:
       id: request
       shell: bash
       env:
-        REGISTRY_ENDPOINT: ${{ inputs.endpoint }}
+        REGISTRY_URL: ${{ inputs.url }}
       run: |
         "${{ github.action_path }}/script.sh"
