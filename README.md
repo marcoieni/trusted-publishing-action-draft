@@ -7,9 +7,14 @@ Get a temporary access token that you can use to interact with crates.io.
 
 ```yaml
 name: Login to crates.io
+
 on:
-  tag:
-    - 'v*'
+  # customize the event that triggers this action
+  push:
+
+# Required for OpenID Connect token retrieval
+permissions:
+  id-token: write
 
 jobs:
     publish:

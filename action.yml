@@ -21,6 +21,13 @@ runs:
       id: request
       shell: bash
       run: |
+        # Check if permissions are set correctly
+        if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+          echo "Error. Please ensure the 'id-token' permission is set to 'write' in your workflow."
+          echo "For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings"
+          exit 1
+        fi
+
         # Get the GitHub Actions JWT token
         echo "Retrieving GitHub Actions JWT token from $ACTIONS_ID_TOKEN_REQUEST_URL"
         jwt_response=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
