@@ -10,6 +10,8 @@ on:
     paths-ignore:
       - "**.md"
 
+permissions: {}
+
 jobs:
   ci:
     runs-on: ubuntu-24.04
