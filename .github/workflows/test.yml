@@ -18,6 +18,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Start mock crates.io server
         run: |
+          # Build the mock server before running it so that
+          # `cargo run` finds the binary and we can run it in the background
+          cargo build --manifest-path=mock/Cargo.toml
           cargo run --manifest-path=mock/Cargo.toml &
 
           # Wait for server to be ready
