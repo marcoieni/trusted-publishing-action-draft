@@ -21,14 +21,25 @@ echo "sent request to $ACTIONS_ID_TOKEN_REQUEST_URL with audience $audience"
 jwt_token=$(echo "$jwt_response" | jq -r '.value')
 echo "retrieved jwt"
 
+# Check if JWT token is empty or null
+if [ -z "$jwt_token" ] || [ "$jwt_token" = "null" ]; then
+  echo "Error: Failed to retrieve JWT token from GitHub Actions. Response: $jwt_response"
+  exit 1
+fi
+
 # Send the request to the endpoint with JWT in payload
 token_response=$(curl -X PUT $REGISTRY_URL/api/v1/trusted_publishing/tokens \
   -H "Content-Type: application/json" \
   -d "{\"jwt\": \"$jwt_token\"}")
 echo "sent request to $REGISTRY_URL/api/v1/trusted_publishing/tokens"
 
-# todo: remove this
-echo $token_response
+# Check if token is empty or null
+if [ -z "$token" ] || [ "$token" = "null" ]; then
+  echo "Error: Failed to retrieve JWT token from GitHub Actions."
+  errors="$(echo "$token_response" | jq -r '.errors')"
+  echo "Errors: $errors"
+  exit 1
+fi
 
 # Extract the token from the JSON response `{ "token": "string" }`.
 token=$(echo "$token_response" | jq -r '.token')
