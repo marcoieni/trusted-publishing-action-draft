@@ -5,6 +5,6 @@
         "lineWidth": 100 // default is `80`
     },
     "files": {
-        "ignore": ["package-lock.json"]
+        "ignore": ["package-lock.json", "dist/"]
     }
 }
