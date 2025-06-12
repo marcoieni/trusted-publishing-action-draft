@@ -3,3 +3,4 @@
 .idea
 mock/target
 node_modules/
+*.js.map
