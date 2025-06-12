@@ -42,3 +42,4 @@ jobs:
 - [ ] add retry logic?
 - [ ] write more docs or link to more docs
 - [ ] add license
+- [ ] zizmor should fail if security issue is detected
