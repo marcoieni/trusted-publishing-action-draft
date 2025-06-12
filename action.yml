@@ -1,0 +1,21 @@
+name: "trusted-publishing"
+author: "WIP"
+description: "WIP"
+inputs:
+outputs:
+  token:
+    description: "WIP"
+    value: ${{ steps.request.outputs.token }}
+branding:
+  icon: "zap"
+  color: "yellow"
+runs:
+  using: "composite"
+  steps:
+    - name: Retrieve trusted publishing token
+      id: request
+      shell: bash
+      run: |
+        response=$(curl -s -X PUT http://localhost:3000/api/v1/trusted_publishing/tokens)
+        token=$(echo "$response" | jq -r '.token')
+        echo "token=$token" >> $GITHUB_OUTPUT

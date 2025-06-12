@@ -1,0 +1,36 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Start mock crates.io server
+        run: |
+          cargo run --manifest-path=mock/Cargo.toml &
+      - name: Start mock crates.io server
+        run: |
+          cargo run --manifest-path=mock/Cargo.toml &
+      - name: Run trusted publishing action
+        id: trusted-publishing
+        uses: ./ # Uses the action in the root directory
+      - name: Assert output
+        env:
+          TOKEN: ${{ steps.trusted-publishing.outputs.token }}
+        run: |
+          if [ "$TOKEN" != "mock-token" ]; then
+            echo "Expected token to be 'mock-token', but got '$TOKEN'"
+            exit 1
+          fi
+          echo "Token assertion passed. Token value: $TOKEN"
