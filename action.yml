@@ -21,11 +21,20 @@ runs:
       id: request
       shell: bash
       run: |
-        # Send the request to the endpoint to retrieve the token.
-        response=$(curl -X PUT ${{ inputs.endpoint }}/api/v1/trusted_publishing/tokens)
+        # Get the GitHub Actions JWT token
+        jwt_response=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+          "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=${{ inputs.endpoint }}")
+
+        # Extract the JWT token from the response
+        jwt_token=$(echo "$jwt_response" | jq -r '.value')
+
+        # Send the request to the endpoint with JWT in payload
+        token_response=$(curl -X PUT ${{ inputs.endpoint }}/api/v1/trusted_publishing/tokens \
+          -H "Content-Type: application/json" \
+          -d "{\"jwt\": \"$jwt_token\"}")
 
         # Extract the token from the JSON response `{ "token": "string" }`.
-        token=$(echo "$response" | jq -r '.token')
+        token=$(echo "$token_response" | jq -r '.token')
 
         # Store the token in GitHub Actions output
         echo "token=$token" >> $GITHUB_OUTPUT
