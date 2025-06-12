@@ -2,6 +2,9 @@
 
 Get a temporary access token that you can use to interact with crates.io.
 
+Remember:
+- You must have configured your crate
+- You already published the first version of your crate (todo: is this only true now and will be fixed eventually?)
 
 ## Usage
 
@@ -39,3 +42,4 @@ jobs:
 - [ ] add retry logic?
 - [ ] write more docs or link to more docs
 - [ ] add license
+- [ ] shellcheck in CI
