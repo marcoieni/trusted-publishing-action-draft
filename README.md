@@ -1,4 +1,4 @@
-# trusted-publishing-test
+# trusted-publishing-action-draft
 
 Get a temporary access token that you can use to interact with crates.io.
 
