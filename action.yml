@@ -15,13 +15,5 @@ branding:
   icon: "zap"
   color: "yellow"
 runs:
-  using: "composite"
-  steps:
-    - name: Retrieve trusted publishing token
-      id: request
-      shell: bash
-      env:
-        REGISTRY_URL: ${{ inputs.url }}
-        GITHUB_ACTION_PATH: ${{ github.action_path }}
-      run: |
-        "$GITHUB_ACTION_PATH/script.sh"
+  using: "node20"
+  main: "src/main.js"

@@ -2,3 +2,4 @@
 .vscode
 .idea
 mock/target
+node_modules/

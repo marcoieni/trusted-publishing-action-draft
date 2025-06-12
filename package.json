@@ -1,0 +1,25 @@
+{
+  "name": "trusted-publishing-action-draft",
+  "version": "0.0.0",
+  "description": "Get a temporary access token that you can use to interact with crates.io.",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcoieni/trusted-publishing-action-draft.git"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/marcoieni/trusted-publishing-action-draft/issues"
+  },
+  "homepage": "https://github.com/marcoieni/trusted-publishing-action-draft#readme"
+}
