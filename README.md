@@ -37,6 +37,21 @@ jobs:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 ```
 
+### Specify a different registry
+
+If you want to use a different registry than crates.io, you can specify the
+registry URL in the `url` input:
+
+```yaml
+      - name: Authenticate with custom registry
+        id: auth
+        uses: rust-lang/crates-io-auth-action@v1
+        with:
+          url: my-registry.example.com
+```
+
+Note that the registry must support OpenID Connect authentication.
+
 ## TODO
 
 - [ ] automate tag update (e.g. v1 updates when v1.0.1 is released)
