@@ -43,11 +43,11 @@ If you want to use a different registry than crates.io, you can specify the
 registry URL in the `url` input:
 
 ```yaml
-      - name: Authenticate with custom registry
-        id: auth
-        uses: rust-lang/crates-io-auth-action@v1
-        with:
-          url: my-registry.example.com
+- name: Authenticate with custom registry
+  id: auth
+  uses: rust-lang/crates-io-auth-action@v1
+  with:
+    url: my-registry.example.com
 ```
 
 Note that the registry must support OpenID Connect authentication.
