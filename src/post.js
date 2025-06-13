@@ -1,4 +1,28 @@
 import * as core from "@actions/core";
+import { setRegistryError } from "./registry_error.js";
+
+async function revokeToken(registryUrl, token) {
+    const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens`;
+
+    core.info(`Revoking token at: ${revokeUrl}`);
+    try {
+        const response = await fetch(revokeUrl, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (response.ok) {
+            core.info("Token revoked successfully");
+        } else {
+            setRegistryError("Failed to revoke token", response);
+        }
+    } catch (error) {
+        core.warning(`Failed to revoke token: ${error.message}`);
+    }
+}
 
 async function cleanup() {
     try {
@@ -12,26 +36,7 @@ async function cleanup() {
 
         core.info("Revoking trusted publishing token");
 
-        // Attempt to revoke the token (if the registry supports it)
-        const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens/revoke`;
-
-        try {
-            const response = await fetch(revokeUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (response.ok) {
-                core.info("Token revoked successfully");
-            } else {
-                core.warning(`Failed to revoke token. Status: ${response.status}`);
-            }
-        } catch (error) {
-            core.warning(`Failed to revoke token: ${error.message}`);
-        }
+        await revokeToken(registryUrl, token);
     } catch (error) {
         core.warning(`Cleanup failed: ${error.message}`);
     }

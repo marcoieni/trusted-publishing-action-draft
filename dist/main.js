@@ -27246,6 +27246,11 @@ function requireCore () {
 
 var coreExports = requireCore();
 
+async function setRegistryError(operation, response) {
+    const errorText = await response.text();
+    coreExports.setFailed(`${operation}. Status: ${response.status}. Response: ${errorText}`);
+}
+
 function getRegistryUrl() {
     const url = coreExports.getInput("url") || "https://crates.io";
 
@@ -27284,10 +27289,7 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        coreExports.setFailed(
-            `Failed to retrieve token from Cargo registry. Status: ${response.status}, Response: ${errorText}`,
-        );
+        setRegistryError("Failed to retrieve token from Cargo registry", response);
         return null;
     }
 
