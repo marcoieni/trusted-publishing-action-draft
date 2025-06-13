@@ -27252,8 +27252,9 @@ async function setRegistryError(operation, response) {
 }
 
 async function revokeToken(registryUrl, token) {
-    const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens/revoke`;
+    const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens`;
 
+    coreExports.info(`Revoking token at: ${revokeUrl}`);
     try {
         const response = await fetch(revokeUrl, {
             method: "DELETE",
