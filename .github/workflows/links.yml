@@ -1,3 +1,5 @@
+# Check if links present in the repository are valid.
+
 name: Links
 
 on:
