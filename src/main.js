@@ -43,10 +43,7 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
     );
 
     if (!tokenResponse.token) {
-        throwErrorMessage(
-            "Failed to retrieve token from Cargo registry",
-            response,
-        );
+        throwErrorMessage("Failed to retrieve token from Cargo registry", response);
     }
 
     return tokenResponse.token;
