@@ -55,16 +55,11 @@ async function requestTrustedPublishingToken(
     return tokenResponse.token;
 }
 
-function setTokenOutputs(token: string, registryUrl: string): void {
+function setTokenOutput(token: string): void {
     // Register the token with the runner as a secret to ensure it is masked in the logs
     core.setSecret(token);
-
-    // Set the token as output, so that users can access it in subsequent workflow steps
     core.setOutput("token", token);
 
-    // Store state used in the post job to revoke the token
-    core.saveState("token", token);
-    core.saveState("registryUrl", registryUrl);
 }
 
 // Extract audience from registry URL by removing `https://` or `http://`
@@ -90,14 +85,18 @@ async function run(): Promise<void> {
 
     const audience = getAudienceFromUrl(registryUrl);
 
-    // Get the GitHub Actions JWT token
+    // Get the GitHub Actions JWT token, used to prove where the GitHub workflow is running
     const jwtToken = await getJwtToken(audience);
 
-    // Request trusted publishing token
+    // Retrieve the temporary token from the Cargo registry
     const token = await requestTrustedPublishingToken(registryUrl, jwtToken);
 
-    // Set outputs and save state
-    setTokenOutputs(token, registryUrl);
+    // Set the token as output, so that users can access it in subsequent workflow steps
+    setTokenOutput(token);
+
+    // Store state used in the post job to revoke the token
+    core.saveState("token", token);
+    core.saveState("registryUrl", registryUrl);
 }
 
 runAction(run);
