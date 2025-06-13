@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
 
-async function revokeToken(registryUrl: string, token: string) {
+async function revokeToken(registryUrl: string, token: string): Promise<void> {
     const tokensEndpoint = getTokensEndpoint(registryUrl);
 
     core.info(`Revoking token at: ${tokensEndpoint}`);
@@ -21,7 +21,7 @@ async function revokeToken(registryUrl: string, token: string) {
     core.info("Token revoked successfully");
 }
 
-async function cleanup() {
+async function cleanup(): Promise<void> {
     const token = core.getState("token");
     const registryUrl = core.getState("registryUrl");
 

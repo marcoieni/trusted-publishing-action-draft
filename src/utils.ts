@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 
-export async function throwHttpErrorMessage(operation: string, response: Response) {
+export async function throwHttpErrorMessage(operation: string, response: Response): Promise<void> {
     const responseText = await response.text();
     let errorMessage = `${operation}. Status: ${response.status}.`;
     if (responseText) {
@@ -10,11 +10,11 @@ export async function throwHttpErrorMessage(operation: string, response: Respons
     throw new Error(errorMessage);
 }
 
-export function getTokensEndpoint(registryUrl: string) {
+export function getTokensEndpoint(registryUrl: string): string {
     return `${registryUrl}/api/v1/trusted_publishing/tokens`;
 }
 
-export function runAction(fn: () => void | Promise<void>) {
+export function runAction(fn: () => void | Promise<void>): void {
     try {
         fn();
     } catch (error) {

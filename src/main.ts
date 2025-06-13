@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
 
-function getRegistryUrl() {
+function getRegistryUrl(): string {
     const url = core.getInput("url") || "https://crates.io";
 
     // Remove trailing `/` at the end of the URL if present
@@ -12,7 +12,7 @@ function getRegistryUrl() {
     return url;
 }
 
-async function getJwtToken(audience: string) {
+async function getJwtToken(audience: string): Promise<string> {
     core.info(`Retrieving GitHub Actions JWT token with audience: ${audience}`);
 
     const jwtToken = await core.getIDToken(audience);
@@ -25,7 +25,10 @@ async function getJwtToken(audience: string) {
     return jwtToken;
 }
 
-async function requestTrustedPublishingToken(registryUrl: string, jwtToken: string) {
+async function requestTrustedPublishingToken(
+    registryUrl: string,
+    jwtToken: string,
+): Promise<string> {
     const tokenUrl = getTokensEndpoint(registryUrl);
     core.info(`Requesting token from: ${tokenUrl}`);
 
@@ -50,7 +53,7 @@ async function requestTrustedPublishingToken(registryUrl: string, jwtToken: stri
     return tokenResponse.token;
 }
 
-function setTokenOutputs(token: string, registryUrl: string) {
+function setTokenOutputs(token: string, registryUrl: string): void {
     core.info("Retrieved token successfully");
 
     // Register the token with the runner as a secret to ensure it is masked in logs
@@ -75,7 +78,7 @@ function getAudienceFromUrl(url: string): string {
     return audience;
 }
 
-async function run() {
+async function run(): Promise<void> {
     // Check if permissions are set correctly
     if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
         throw new Error(
@@ -83,7 +86,6 @@ async function run() {
         );
     }
 
-    // Normalize the registry URL
     const registryUrl = getRegistryUrl();
 
     const audience = getAudienceFromUrl(registryUrl);
