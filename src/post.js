@@ -2,8 +2,9 @@ import * as core from "@actions/core";
 import { setRegistryError } from "./registry_error.js";
 
 async function revokeToken(registryUrl, token) {
-    const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens/revoke`;
+    const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens`;
 
+    core.info(`Revoking token at: ${revokeUrl}`);
     try {
         const response = await fetch(revokeUrl, {
             method: "DELETE",
