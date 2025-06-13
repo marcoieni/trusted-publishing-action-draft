@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
+import { getAudienceFromUrl, getRegistryUrl } from "./registry_url.js";
 import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
-import { getRegistryUrl, getAudienceFromUrl } from "./registry_url.js";
 
 runAction(run);
 
@@ -29,7 +29,6 @@ async function run(): Promise<void> {
     core.saveState("token", token);
     core.saveState("registryUrl", registryUrl);
 }
-
 
 async function getJwtToken(audience: string): Promise<string> {
     core.info(`Retrieving GitHub Actions JWT token with audience: ${audience}`);
@@ -66,7 +65,10 @@ async function requestTrustedPublishingToken(
     const tokenResponse = (await response.json()) as { token: string };
 
     if (!tokenResponse.token) {
-        await throwHttpErrorMessage("Failed to retrieve token from the Cargo registry response body", response);
+        await throwHttpErrorMessage(
+            "Failed to retrieve token from the Cargo registry response body",
+            response,
+        );
     }
 
     core.info("Retrieved token successfully");
@@ -78,5 +80,4 @@ function setTokenOutput(token: string): void {
     // Register the token with the runner as a secret to ensure it is masked in the logs.
     core.setSecret(token);
     core.setOutput("token", token);
-
 }
