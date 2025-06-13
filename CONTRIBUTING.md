@@ -15,6 +15,12 @@ npx @biomejs/biome check --write
 To avoid committing the `node_modules` directory, we use `npm run package` to compile the action
 into a single file.
 
+## Crates.io docs
+
+To check the Crates.io OpenAPI documentation,
+copy paste `https://crates.io/api/openapi.json`
+in the [swagger](https://petstore.swagger.io/) bar at the top of the page.
+
 ## FAQ
 
 ### Why javascript?

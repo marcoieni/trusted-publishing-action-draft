@@ -1,5 +1,3 @@
-// Crates.io mock server
-
 use axum::{
     Router,
     http::{HeaderMap, StatusCode},
