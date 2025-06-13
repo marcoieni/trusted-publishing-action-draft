@@ -4,7 +4,7 @@ use axum::{
     Router,
     http::StatusCode,
     response::Json,
-    routing::{get, put},
+    routing::{delete, get, put},
 };
 use serde::{Deserialize, Serialize};
 use tokio;
@@ -27,14 +27,20 @@ async fn get_token(Json(_payload): Json<TokenRequest>) -> Result<Json<TokenRespo
     Ok(Json(response))
 }
 
+async fn revoke_token() -> Result<StatusCode, ()> {
+    Ok(StatusCode::NO_CONTENT)
+}
+
 async fn health() -> Result<(), StatusCode> {
     Ok(())
 }
 
 #[tokio::main]
 async fn main() {
+    let tokens_endpoint ="/api/v1/trusted_publishing/tokens";
     let app = Router::new()
-        .route("/api/v1/trusted_publishing/tokens", put(get_token))
+        .route(tokens_endpoint, put(get_token))
+        .route(tokens_endpoint, delete(revoke_token))
         .route("/health", get(health));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
