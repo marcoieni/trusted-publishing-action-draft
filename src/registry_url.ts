@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 
-// Extract audience from registry URL by removing `https://` or `http://`
+// Extract audience from registry URL by removing `https://` or `http://`.
 export function getAudienceFromUrl(url: string): string {
     const audience = url.replace(/^https?:\/\//, "");
 
@@ -14,7 +14,7 @@ export function getAudienceFromUrl(url: string): string {
 export function getRegistryUrl(): string {
     const url = core.getInput("url") || "https://crates.io";
 
-    // Remove trailing `/` at the end of the URL if present
+    // Remove trailing `/` at the end of the URL if present.
     if (url.endsWith("/")) {
         return url.slice(0, -1);
     }

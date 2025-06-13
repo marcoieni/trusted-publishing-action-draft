@@ -5,7 +5,7 @@ import { getRegistryUrl, getAudienceFromUrl } from "./registry_url.js";
 runAction(run);
 
 async function run(): Promise<void> {
-    // Check if permissions are set correctly
+    // Check if permissions are set correctly.
     if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
         throw new Error(
             "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
@@ -16,16 +16,16 @@ async function run(): Promise<void> {
 
     const audience = getAudienceFromUrl(registryUrl);
 
-    // Get the GitHub Actions JWT token, used to prove where the GitHub workflow is running
+    // Get the GitHub Actions JWT token, used to prove where the GitHub workflow is running.
     const jwtToken = await getJwtToken(audience);
 
-    // Retrieve the temporary token from the Cargo registry
+    // Retrieve the temporary token from the Cargo registry.
     const token = await requestTrustedPublishingToken(registryUrl, jwtToken);
 
-    // Set the token as output, so that users can access it in subsequent workflow steps
+    // Set the token as output, so that users can access it in subsequent workflow steps.
     setTokenOutput(token);
 
-    // Store state used in the post job to revoke the token
+    // Store state used in the post job to revoke the token.
     core.saveState("token", token);
     core.saveState("registryUrl", registryUrl);
 }
@@ -60,7 +60,7 @@ async function requestTrustedPublishingToken(
     });
 
     if (!response.ok) {
-        // status is not in the range 200-299
+        // Status is not in the range 200-299.
         await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
     }
     const tokenResponse = (await response.json()) as { token: string };
@@ -75,7 +75,7 @@ async function requestTrustedPublishingToken(
 }
 
 function setTokenOutput(token: string): void {
-    // Register the token with the runner as a secret to ensure it is masked in the logs
+    // Register the token with the runner as a secret to ensure it is masked in the logs.
     core.setSecret(token);
     core.setOutput("token", token);
 

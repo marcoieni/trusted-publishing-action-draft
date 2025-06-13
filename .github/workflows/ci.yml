@@ -24,7 +24,7 @@ jobs:
 
       - name: Check
         run: |
-          # Check format and lint
+          # Check format and lint.
           npx @biomejs/biome check
 
   zizmor:
@@ -56,16 +56,16 @@ jobs:
 
       - name: Check is packaged
         run: |
-          # Compile to single js files
+          # Compile to single js files.
           npm run package
 
-          # Assert that the git diff is empty
+          # Assert that the git diff is empty.
           git diff --exit-code || (echo "Git diff is not empty. Please run 'npm run package' and commit the changes." && exit 1)
 
   test:
     runs-on: ubuntu-24.04
 
-    # Required for OpenID Connect token retrieval
+    # Required for OpenID Connect token retrieval.
     permissions:
       id-token: write
 
@@ -78,12 +78,12 @@ jobs:
       - name: Start mock crates.io server
         run: |
           # Build the mock server before running it so that
-          # `cargo run` finds the binary and we can run it in the background
+          # `cargo run` finds the binary and we can run it in the background.
           manifest_path="--manifest-path=mock/Cargo.toml"
           cargo build $manifest_path
           cargo run   $manifest_path &
 
-          # Wait for server to be ready
+          # Wait for server to be ready.
           retry_count=0
           max_retries=3
           until curl -s http://localhost:3000/health > /dev/null 2>&1; do
@@ -99,9 +99,9 @@ jobs:
 
       - name: Run trusted publishing action
         id: trusted-publishing
-        uses: ./ # Uses the action in the root directory
+        uses: ./ # Uses the action in the root directory.
         with:
-          url: "http://localhost:3000" # Mock server url
+          url: "http://localhost:3000" # Mock server url.
 
       - name: Assert action output
         env:
