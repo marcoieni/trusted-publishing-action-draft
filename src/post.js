@@ -1,27 +1,24 @@
 import * as core from "@actions/core";
-import { setRegistryError } from "./registry_error.js";
+import { throwErrorMessage } from "./registry_error.js";
 
 async function revokeToken(registryUrl, token) {
     const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens`;
 
     core.info(`Revoking token at: ${revokeUrl}`);
-    try {
-        const response = await fetch(revokeUrl, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
 
-        if (response.ok) {
-            core.info("Token revoked successfully");
-        } else {
-            setRegistryError("Failed to revoke token", response);
-        }
-    } catch (error) {
-        core.warning(`Failed to revoke token: ${error.message}`);
+    const response = await fetch(revokeUrl, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        await throwErrorMessage("Failed to revoke token", response);
     }
+
+    core.info("Token revoked successfully");
 }
 
 async function cleanup() {
@@ -38,7 +35,7 @@ async function cleanup() {
 
         await revokeToken(registryUrl, token);
     } catch (error) {
-        core.warning(`Cleanup failed: ${error.message}`);
+        core.setFailed(`Cleanup failed: ${error.message}`);
     }
 }
 
