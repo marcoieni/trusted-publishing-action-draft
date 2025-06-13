@@ -50,12 +50,12 @@ async function requestTrustedPublishingToken(
         await throwHttpErrorMessage("Failed to retrieve token from the Cargo registry response body", response);
     }
 
+    core.info("Retrieved token successfully");
+
     return tokenResponse.token;
 }
 
 function setTokenOutputs(token: string, registryUrl: string): void {
-    core.info("Retrieved token successfully");
-
     // Register the token with the runner as a secret to ensure it is masked in logs
     core.setSecret(token);
 
