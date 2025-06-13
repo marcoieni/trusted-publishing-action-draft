@@ -27246,32 +27246,34 @@ function requireCore () {
 
 var coreExports = requireCore();
 
-async function setRegistryError(operation, response) {
-    const errorText = await response.text();
-    coreExports.setFailed(`${operation}. Status: ${response.status}. Response: ${errorText}`);
+async function throwErrorMessage(operation, response) {
+    const responseText = await response.text();
+    let errorMessage = `${operation}. Status: ${response.status}.`;
+    if (responseText) {
+        errorMessage += ` Response: ${responseText}`;
+    }
+
+    throw new Error(errorMessage);
 }
 
 async function revokeToken(registryUrl, token) {
     const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens`;
 
     coreExports.info(`Revoking token at: ${revokeUrl}`);
-    try {
-        const response = await fetch(revokeUrl, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
 
-        if (response.ok) {
-            coreExports.info("Token revoked successfully");
-        } else {
-            setRegistryError("Failed to revoke token", response);
-        }
-    } catch (error) {
-        coreExports.warning(`Failed to revoke token: ${error.message}`);
+    const response = await fetch(revokeUrl, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        await throwErrorMessage("Failed to revoke token", response);
     }
+
+    coreExports.info("Token revoked successfully");
 }
 
 async function cleanup() {
@@ -27288,7 +27290,7 @@ async function cleanup() {
 
         await revokeToken(registryUrl, token);
     } catch (error) {
-        coreExports.warning(`Cleanup failed: ${error.message}`);
+        coreExports.setFailed(`Cleanup failed: ${error.message}`);
     }
 }
 

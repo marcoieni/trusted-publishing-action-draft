@@ -27246,9 +27246,23 @@ function requireCore () {
 
 var coreExports = requireCore();
 
-async function setRegistryError(operation, response) {
-    const errorText = await response.text();
-    coreExports.setFailed(`${operation}. Status: ${response.status}. Response: ${errorText}`);
+async function getJsonBody(operation, response) {
+    if (response.ok) {
+        // status is in the range 200-299
+        return await response.json();
+    }
+
+    await throwErrorMessage(operation, response);
+}
+
+async function throwErrorMessage(operation, response) {
+    const responseText = await response.text();
+    let errorMessage = `${operation}. Status: ${response.status}.`;
+    if (responseText) {
+        errorMessage += ` Response: ${responseText}`;
+    }
+
+    throw new Error(errorMessage);
 }
 
 function getRegistryUrl() {
@@ -27268,8 +27282,7 @@ async function getJwtToken(audience) {
     const jwtToken = await coreExports.getIDToken(audience);
 
     if (!jwtToken) {
-        coreExports.setFailed("Error: Failed to retrieve JWT token from GitHub Actions");
-        return null;
+        throw new Error("Failed to retrieve JWT token from GitHub Actions");
     }
 
     coreExports.info("Retrieved JWT token successfully");
@@ -27288,17 +27301,14 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
         body: JSON.stringify({ jwt: jwtToken }),
     });
 
-    if (!response.ok) {
-        setRegistryError("Failed to retrieve token from Cargo registry", response);
-        return null;
-    }
-
-    const tokenResponse = await response.json();
+    const tokenResponse = await getJsonBody(
+        "Failed to retrieve token from Cargo registry",
+        response,
+    );
 
     if (!tokenResponse.token) {
         const errors = tokenResponse.errors || "Unknown error";
-        coreExports.setFailed(`Error: Failed to retrieve token from Cargo registry. Errors: ${errors}`);
-        return null;
+        throw new Error(`Failed to retrieve token from Cargo registry. Errors: ${errors}`);
     }
 
     return tokenResponse.token;
@@ -27323,8 +27333,7 @@ function getAudienceFromUrl(url) {
     const audience = url.replace(/^https?:\/\//, "");
 
     if (audience.startsWith("http://") || audience.startsWith("https://")) {
-        coreExports.setFailed("Bug: The audience should not include the protocol (http:// or https://).");
-        return;
+        throw new Error("Bug: The audience should not include the protocol (http:// or https://).");
     }
 
     return audience;
@@ -27334,10 +27343,9 @@ async function run() {
     try {
         // Check if permissions are set correctly
         if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
-            coreExports.setFailed(
-                "Error. Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
+            throw new Error(
+                "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
             );
-            return;
         }
 
         // Normalize the registry URL
@@ -27347,20 +27355,14 @@ async function run() {
 
         // Get the GitHub Actions JWT token
         const jwtToken = await getJwtToken(audience);
-        if (!jwtToken) {
-            return;
-        }
 
         // Request trusted publishing token
         const token = await requestTrustedPublishingToken(registryUrl, jwtToken);
-        if (!token) {
-            return;
-        }
 
         // Set outputs and save state
         setTokenOutputs(token, registryUrl);
     } catch (error) {
-        coreExports.setFailed(`Action failed with error: ${error.message}`);
+        coreExports.setFailed(`Action failed: ${error.message}`);
     }
 }
 
