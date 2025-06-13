@@ -27307,8 +27307,10 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
     );
 
     if (!tokenResponse.token) {
-        const errors = tokenResponse.errors || "Unknown error";
-        throw new Error(`Failed to retrieve token from Cargo registry. Errors: ${errors}`);
+        throwErrorMessage(
+            "Failed to retrieve token from Cargo registry",
+            response,
+        );
     }
 
     return tokenResponse.token;

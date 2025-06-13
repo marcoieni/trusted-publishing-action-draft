@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { getJsonBody } from "./registry_error.js";
+import { getJsonBody, throwErrorMessage } from "./registry_error.js";
 
 function getRegistryUrl() {
     const url = core.getInput("url") || "https://crates.io";
@@ -43,8 +43,10 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
     );
 
     if (!tokenResponse.token) {
-        const errors = tokenResponse.errors || "Unknown error";
-        throw new Error(`Failed to retrieve token from Cargo registry. Errors: ${errors}`);
+        throwErrorMessage(
+            "Failed to retrieve token from Cargo registry",
+            response,
+        );
     }
 
     return tokenResponse.token;
