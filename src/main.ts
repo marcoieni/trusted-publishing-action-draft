@@ -56,13 +56,13 @@ async function requestTrustedPublishingToken(
 }
 
 function setTokenOutputs(token: string, registryUrl: string): void {
-    // Register the token with the runner as a secret to ensure it is masked in logs
+    // Register the token with the runner as a secret to ensure it is masked in the logs
     core.setSecret(token);
 
-    // Set the token as output
+    // Set the token as output, so that users can access it in subsequent workflow steps
     core.setOutput("token", token);
 
-    // Store token for cleanup in post action
+    // Store state used in the post job to revoke the token
     core.saveState("token", token);
     core.saveState("registryUrl", registryUrl);
 }
