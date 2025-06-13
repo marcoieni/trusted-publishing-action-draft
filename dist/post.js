@@ -27246,7 +27246,7 @@ function requireCore () {
 
 var coreExports = requireCore();
 
-async function throwErrorMessage(operation, response) {
+async function throwHttpErrorMessage(operation, response) {
     const responseText = await response.text();
     let errorMessage = `${operation}. Status: ${response.status}.`;
     if (responseText) {
@@ -27256,12 +27256,16 @@ async function throwErrorMessage(operation, response) {
     throw new Error(errorMessage);
 }
 
+function getTokensEndpoint(registryUrl) {
+    return `${registryUrl}/api/v1/trusted_publishing/tokens`;
+}
+
 async function revokeToken(registryUrl, token) {
-    const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens`;
+    const tokensEndpoint = getTokensEndpoint(registryUrl);
 
-    coreExports.info(`Revoking token at: ${revokeUrl}`);
+    coreExports.info(`Revoking token at: ${tokensEndpoint}`);
 
-    const response = await fetch(revokeUrl, {
+    const response = await fetch(tokensEndpoint, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -27270,7 +27274,7 @@ async function revokeToken(registryUrl, token) {
     });
 
     if (!response.ok) {
-        await throwErrorMessage("Failed to revoke token", response);
+        await throwHttpErrorMessage("Failed to revoke token", response);
     }
 
     coreExports.info("Token revoked successfully");

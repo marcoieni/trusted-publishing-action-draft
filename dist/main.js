@@ -27246,16 +27246,7 @@ function requireCore () {
 
 var coreExports = requireCore();
 
-async function getJsonBody(operation, response) {
-    if (response.ok) {
-        // status is in the range 200-299
-        return await response.json();
-    }
-
-    await throwErrorMessage(operation, response);
-}
-
-async function throwErrorMessage(operation, response) {
+async function throwHttpErrorMessage(operation, response) {
     const responseText = await response.text();
     let errorMessage = `${operation}. Status: ${response.status}.`;
     if (responseText) {
@@ -27263,6 +27254,10 @@ async function throwErrorMessage(operation, response) {
     }
 
     throw new Error(errorMessage);
+}
+
+function getTokensEndpoint(registryUrl) {
+    return `${registryUrl}/api/v1/trusted_publishing/tokens`;
 }
 
 function getRegistryUrl() {
@@ -27290,7 +27285,7 @@ async function getJwtToken(audience) {
 }
 
 async function requestTrustedPublishingToken(registryUrl, jwtToken) {
-    const tokenUrl = `${registryUrl}/api/v1/trusted_publishing/tokens`;
+    const tokenUrl = getTokensEndpoint(registryUrl);
     coreExports.info(`Requesting token from: ${tokenUrl}`);
 
     const response = await fetch(tokenUrl, {
@@ -27301,13 +27296,14 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
         body: JSON.stringify({ jwt: jwtToken }),
     });
 
-    const tokenResponse = await getJsonBody(
-        "Failed to retrieve token from Cargo registry",
-        response,
-    );
+    if (!response.ok) {
+        // status is not in the range 200-299
+        await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
+    }
+    const tokenResponse = await response.json();
 
     if (!tokenResponse.token) {
-        throwErrorMessage("Failed to retrieve token from Cargo registry", response);
+        await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
     }
 
     return tokenResponse.token;

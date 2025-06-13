@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { getJsonBody, throwErrorMessage } from "./registry_error.js";
+import { getTokensEndpoint, throwHttpErrorMessage } from "./http_utils.js";
 
 function getRegistryUrl() {
     const url = core.getInput("url") || "https://crates.io";
@@ -26,7 +26,7 @@ async function getJwtToken(audience) {
 }
 
 async function requestTrustedPublishingToken(registryUrl, jwtToken) {
-    const tokenUrl = `${registryUrl}/api/v1/trusted_publishing/tokens`;
+    const tokenUrl = getTokensEndpoint(registryUrl);
     core.info(`Requesting token from: ${tokenUrl}`);
 
     const response = await fetch(tokenUrl, {
@@ -37,13 +37,14 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
         body: JSON.stringify({ jwt: jwtToken }),
     });
 
-    const tokenResponse = await getJsonBody(
-        "Failed to retrieve token from Cargo registry",
-        response,
-    );
+    if (!response.ok) {
+        // status is not in the range 200-299
+        await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
+    }
+    const tokenResponse = await response.json();
 
     if (!tokenResponse.token) {
-        throwErrorMessage("Failed to retrieve token from Cargo registry", response);
+        await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
     }
 
     return tokenResponse.token;
