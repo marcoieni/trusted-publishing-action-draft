@@ -84,5 +84,4 @@ sequenceDiagram
 - [ ] add license
 - [ ] test that the token output is set as sensitive, if possible
 - [ ] configure automatic dependencies updates (renovate or dependabot)
-- [ ] fail in CI for unused items in js
 - [ ] add integration tests with snapshots to test error cases
