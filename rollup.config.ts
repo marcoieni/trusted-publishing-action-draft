@@ -2,17 +2,18 @@
 
 import commonjs from "@rollup/plugin-commonjs";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
+import typescript from "@rollup/plugin-typescript";
 
 function configBlock(filename) {
     return {
-        input: `src/${filename}.js`,
+        input: `src/${filename}.ts`,
         output: {
             esModule: true,
             file: `dist/${filename}.js`,
             format: "es",
             sourcemap: true,
         },
-        plugins: [commonjs(), nodeResolve({ preferBuiltins: true })],
+        plugins: [typescript(), commonjs(), nodeResolve({ preferBuiltins: true })],
     };
 }
 

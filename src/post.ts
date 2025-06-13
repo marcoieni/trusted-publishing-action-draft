@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
-import { getTokensEndpoint, throwHttpErrorMessage } from "./http_utils.js";
+import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
 
-async function revokeToken(registryUrl, token) {
+async function revokeToken(registryUrl: string, token: string) {
     const tokensEndpoint = getTokensEndpoint(registryUrl);
 
     core.info(`Revoking token at: ${tokensEndpoint}`);
@@ -22,21 +22,17 @@ async function revokeToken(registryUrl, token) {
 }
 
 async function cleanup() {
-    try {
-        const token = core.getState("token");
-        const registryUrl = core.getState("registryUrl");
+    const token = core.getState("token");
+    const registryUrl = core.getState("registryUrl");
 
-        if (!token) {
-            core.info("No token to revoke");
-            return;
-        }
-
-        core.info("Revoking trusted publishing token");
-
-        await revokeToken(registryUrl, token);
-    } catch (error) {
-        core.setFailed(`Cleanup failed: ${error.message}`);
+    if (!token) {
+        core.info("No token to revoke");
+        return;
     }
+
+    core.info("Revoking trusted publishing token");
+
+    await revokeToken(registryUrl, token);
 }
 
-cleanup();
+runAction(cleanup);

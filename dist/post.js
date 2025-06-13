@@ -27252,19 +27252,24 @@ async function throwHttpErrorMessage(operation, response) {
     if (responseText) {
         errorMessage += ` Response: ${responseText}`;
     }
-
     throw new Error(errorMessage);
 }
-
 function getTokensEndpoint(registryUrl) {
     return `${registryUrl}/api/v1/trusted_publishing/tokens`;
+}
+function runAction(fn) {
+    try {
+        fn();
+    }
+    catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        coreExports.setFailed(`Error: ${errorMessage}`);
+    }
 }
 
 async function revokeToken(registryUrl, token) {
     const tokensEndpoint = getTokensEndpoint(registryUrl);
-
     coreExports.info(`Revoking token at: ${tokensEndpoint}`);
-
     const response = await fetch(tokensEndpoint, {
         method: "DELETE",
         headers: {
@@ -27272,31 +27277,20 @@ async function revokeToken(registryUrl, token) {
             Authorization: `Bearer ${token}`,
         },
     });
-
     if (!response.ok) {
         await throwHttpErrorMessage("Failed to revoke token", response);
     }
-
     coreExports.info("Token revoked successfully");
 }
-
 async function cleanup() {
-    try {
-        const token = coreExports.getState("token");
-        const registryUrl = coreExports.getState("registryUrl");
-
-        if (!token) {
-            coreExports.info("No token to revoke");
-            return;
-        }
-
-        coreExports.info("Revoking trusted publishing token");
-
-        await revokeToken(registryUrl, token);
-    } catch (error) {
-        coreExports.setFailed(`Cleanup failed: ${error.message}`);
+    const token = coreExports.getState("token");
+    const registryUrl = coreExports.getState("registryUrl");
+    if (!token) {
+        coreExports.info("No token to revoke");
+        return;
     }
+    coreExports.info("Revoking trusted publishing token");
+    await revokeToken(registryUrl, token);
 }
-
-cleanup();
+runAction(cleanup);
 //# sourceMappingURL=post.js.map

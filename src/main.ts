@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { getTokensEndpoint, throwHttpErrorMessage } from "./http_utils.js";
+import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
 
 function getRegistryUrl() {
     const url = core.getInput("url") || "https://crates.io";
@@ -12,7 +12,7 @@ function getRegistryUrl() {
     return url;
 }
 
-async function getJwtToken(audience) {
+async function getJwtToken(audience: string) {
     core.info(`Retrieving GitHub Actions JWT token with audience: ${audience}`);
 
     const jwtToken = await core.getIDToken(audience);
@@ -25,7 +25,7 @@ async function getJwtToken(audience) {
     return jwtToken;
 }
 
-async function requestTrustedPublishingToken(registryUrl, jwtToken) {
+async function requestTrustedPublishingToken(registryUrl: string, jwtToken: string) {
     const tokenUrl = getTokensEndpoint(registryUrl);
     core.info(`Requesting token from: ${tokenUrl}`);
 
@@ -41,7 +41,7 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
         // status is not in the range 200-299
         await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
     }
-    const tokenResponse = await response.json();
+    const tokenResponse = (await response.json()) as { token: string };
 
     if (!tokenResponse.token) {
         await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
@@ -50,7 +50,7 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
     return tokenResponse.token;
 }
 
-function setTokenOutputs(token, registryUrl) {
+function setTokenOutputs(token: string, registryUrl: string) {
     core.info("Retrieved token successfully");
 
     // Register the token with the runner as a secret to ensure it is masked in logs
@@ -65,7 +65,7 @@ function setTokenOutputs(token, registryUrl) {
 }
 
 // Extract audience from registry URL by removing `https://` or `http://`
-function getAudienceFromUrl(url) {
+function getAudienceFromUrl(url: string): string {
     const audience = url.replace(/^https?:\/\//, "");
 
     if (audience.startsWith("http://") || audience.startsWith("https://")) {
@@ -76,30 +76,26 @@ function getAudienceFromUrl(url) {
 }
 
 async function run() {
-    try {
-        // Check if permissions are set correctly
-        if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
-            throw new Error(
-                "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
-            );
-        }
-
-        // Normalize the registry URL
-        const registryUrl = getRegistryUrl();
-
-        const audience = getAudienceFromUrl(registryUrl);
-
-        // Get the GitHub Actions JWT token
-        const jwtToken = await getJwtToken(audience);
-
-        // Request trusted publishing token
-        const token = await requestTrustedPublishingToken(registryUrl, jwtToken);
-
-        // Set outputs and save state
-        setTokenOutputs(token, registryUrl);
-    } catch (error) {
-        core.setFailed(`Action failed: ${error.message}`);
+    // Check if permissions are set correctly
+    if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
+        throw new Error(
+            "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
+        );
     }
+
+    // Normalize the registry URL
+    const registryUrl = getRegistryUrl();
+
+    const audience = getAudienceFromUrl(registryUrl);
+
+    // Get the GitHub Actions JWT token
+    const jwtToken = await getJwtToken(audience);
+
+    // Request trusted publishing token
+    const token = await requestTrustedPublishingToken(registryUrl, jwtToken);
+
+    // Set outputs and save state
+    setTokenOutputs(token, registryUrl);
 }
 
-run();
+runAction(run);
