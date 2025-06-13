@@ -47,7 +47,7 @@ async function requestTrustedPublishingToken(
     const tokenResponse = (await response.json()) as { token: string };
 
     if (!tokenResponse.token) {
-        await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
+        await throwHttpErrorMessage("Failed to decode body while retrieving token from Cargo registry", response);
     }
 
     return tokenResponse.token;
