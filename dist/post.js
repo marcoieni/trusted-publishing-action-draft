@@ -27256,7 +27256,7 @@ async function revokeToken(registryUrl, token) {
 
     try {
         const response = await fetch(revokeUrl, {
-            method: "POST",
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
