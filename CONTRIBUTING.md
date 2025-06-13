@@ -24,6 +24,12 @@ To check the Crates.io OpenAPI documentation,
 copy paste `https://crates.io/api/openapi.json`
 in the [swagger](https://petstore.swagger.io/) bar at the top of the page.
 
+## GitHub docs
+
+Here are some useful links to the GitHub documentation:
+- [Creating a javascript action](https://docs.github.com/en/actions/sharing-automations/creating-actions/creating-a-javascript-action)
+- [OpenID Connect](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
+
 ## FAQ
 
 ### Why javascript?
