@@ -8,7 +8,8 @@ You can't run or test this action locally because it requires a GitHub environme
 
 The code of the action is in `src/`.
 After you edit the code, run the following command to
-compile the typescript code and its dependencies into a single file in the `dist/` directory:
+compile the typescript code and its dependencies into a single typescript
+file in the `dist/` directory:
 
 ```bash
 npm run package
