@@ -43,4 +43,3 @@ jobs:
 - [ ] write more docs or link to more docs
 - [ ] add license
 - [ ] test that the token output is set as sensitive, if possible
-- [ ] simplify the rollup configuration

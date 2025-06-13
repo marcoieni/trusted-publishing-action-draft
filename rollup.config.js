@@ -3,27 +3,19 @@
 import commonjs from "@rollup/plugin-commonjs";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 
-const config = [
-    {
-        input: "src/main.js",
+function configBlock(filename) {
+    return {
+        input: `src/${filename}.js`,
         output: {
             esModule: true,
-            file: "dist/main.js",
+            file: `dist/${filename}.js`,
             format: "es",
             sourcemap: true,
         },
         plugins: [commonjs(), nodeResolve({ preferBuiltins: true })],
-    },
-    {
-        input: "src/post.js",
-        output: {
-            esModule: true,
-            file: "dist/post.js",
-            format: "es",
-            sourcemap: true,
-        },
-        plugins: [commonjs(), nodeResolve({ preferBuiltins: true })],
-    },
-];
+    };
+}
+
+const config = [configBlock("main"), configBlock("post")];
 
 export default config;
