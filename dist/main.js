@@ -27246,6 +27246,23 @@ function requireCore () {
 
 var coreExports = requireCore();
 
+// Extract audience from registry URL by removing `https://` or `http://`.
+function getAudienceFromUrl(url) {
+    const audience = url.replace(/^https?:\/\//, "");
+    if (audience.startsWith("http://") || audience.startsWith("https://")) {
+        throw new Error("Bug: The audience should not include the protocol (http:// or https://).");
+    }
+    return audience;
+}
+function getRegistryUrl() {
+    const url = coreExports.getInput("url") || "https://crates.io";
+    // Remove trailing `/` at the end of the URL if present.
+    if (url.endsWith("/")) {
+        return url.slice(0, -1);
+    }
+    return url;
+}
+
 async function throwHttpErrorMessage(operation, response) {
     const responseText = await response.text();
     let errorMessage = `${operation}. Status: ${response.status}.`;
@@ -27267,13 +27284,23 @@ function runAction(fn) {
     }
 }
 
-function getRegistryUrl() {
-    const url = coreExports.getInput("url") || "https://crates.io";
-    // Remove trailing `/` at the end of the URL if present
-    if (url.endsWith("/")) {
-        return url.slice(0, -1);
+runAction(run);
+async function run() {
+    // Check if permissions are set correctly.
+    if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
+        throw new Error("Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings");
     }
-    return url;
+    const registryUrl = getRegistryUrl();
+    const audience = getAudienceFromUrl(registryUrl);
+    // Get the GitHub Actions JWT token, used to prove where the GitHub workflow is running.
+    const jwtToken = await getJwtToken(audience);
+    // Retrieve the temporary token from the Cargo registry.
+    const token = await requestTrustedPublishingToken(registryUrl, jwtToken);
+    // Set the token as output, so that users can access it in subsequent workflow steps.
+    setTokenOutput(token);
+    // Store state used in the post job to revoke the token.
+    coreExports.saveState("token", token);
+    coreExports.saveState("registryUrl", registryUrl);
 }
 async function getJwtToken(audience) {
     coreExports.info(`Retrieving GitHub Actions JWT token with audience: ${audience}`);
@@ -27295,47 +27322,19 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
         body: JSON.stringify({ jwt: jwtToken }),
     });
     if (!response.ok) {
-        // status is not in the range 200-299
+        // Status is not in the range 200-299.
         await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
     }
     const tokenResponse = (await response.json());
     if (!tokenResponse.token) {
-        await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
+        await throwHttpErrorMessage("Failed to retrieve token from the Cargo registry response body", response);
     }
+    coreExports.info("Retrieved token successfully");
     return tokenResponse.token;
 }
-function setTokenOutputs(token, registryUrl) {
-    coreExports.info("Retrieved token successfully");
-    // Register the token with the runner as a secret to ensure it is masked in logs
+function setTokenOutput(token) {
+    // Register the token with the runner as a secret to ensure it is masked in the logs.
     coreExports.setSecret(token);
-    // Set the token as output
     coreExports.setOutput("token", token);
-    // Store token for cleanup in post action
-    coreExports.saveState("token", token);
-    coreExports.saveState("registryUrl", registryUrl);
 }
-// Extract audience from registry URL by removing `https://` or `http://`
-function getAudienceFromUrl(url) {
-    const audience = url.replace(/^https?:\/\//, "");
-    if (audience.startsWith("http://") || audience.startsWith("https://")) {
-        throw new Error("Bug: The audience should not include the protocol (http:// or https://).");
-    }
-    return audience;
-}
-async function run() {
-    // Check if permissions are set correctly
-    if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
-        throw new Error("Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings");
-    }
-    // Normalize the registry URL
-    const registryUrl = getRegistryUrl();
-    const audience = getAudienceFromUrl(registryUrl);
-    // Get the GitHub Actions JWT token
-    const jwtToken = await getJwtToken(audience);
-    // Request trusted publishing token
-    const token = await requestTrustedPublishingToken(registryUrl, jwtToken);
-    // Set outputs and save state
-    setTokenOutputs(token, registryUrl);
-}
-runAction(run);
 //# sourceMappingURL=main.js.map

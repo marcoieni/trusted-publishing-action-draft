@@ -27267,7 +27267,22 @@ function runAction(fn) {
     }
 }
 
+runAction(cleanup);
+async function cleanup() {
+    // Retrieve the token and registry URL from the action state.
+    // These values are set in the main job.
+    const token = coreExports.getState("token");
+    const registryUrl = coreExports.getState("registryUrl");
+    if (!token) {
+        // Probably the action terminated before the token was retrieved.
+        coreExports.info("No token to revoke");
+        return;
+    }
+    // Revoke token so that even if it's leaked, it cannot be used anymore.
+    await revokeToken(registryUrl, token);
+}
 async function revokeToken(registryUrl, token) {
+    coreExports.info("Revoking trusted publishing token");
     const tokensEndpoint = getTokensEndpoint(registryUrl);
     coreExports.info(`Revoking token at: ${tokensEndpoint}`);
     const response = await fetch(tokensEndpoint, {
@@ -27282,15 +27297,4 @@ async function revokeToken(registryUrl, token) {
     }
     coreExports.info("Token revoked successfully");
 }
-async function cleanup() {
-    const token = coreExports.getState("token");
-    const registryUrl = coreExports.getState("registryUrl");
-    if (!token) {
-        coreExports.info("No token to revoke");
-        return;
-    }
-    coreExports.info("Revoking trusted publishing token");
-    await revokeToken(registryUrl, token);
-}
-runAction(cleanup);
 //# sourceMappingURL=post.js.map
