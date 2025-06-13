@@ -1,6 +1,23 @@
 # Contributing
 
-## Format and lint
+## Local development
+
+You can't run or test this action locally because it requires a GitHub environment to run.
+
+### Packaging
+
+The code of the action is in `src/`.
+After you edit the code, run the following command to
+compile the javascript code and its dependencies into a single file in the `dist/` directory:
+
+```bash
+npm run package
+```
+
+This approach is inspired by the [javascript-action](https://github.com/actions/javascript-action)
+repository and it's used to avoid committing the `node_modules` directory to the repository.
+
+### Format and lint
 
 We use [Biome](https://biomejs.dev/) for formatting and linting.
 
@@ -9,14 +26,6 @@ To format and fix lints, run:
 ```bash
 npx @biomejs/biome check --write
 ```
-
-## Packaging
-
-To avoid committing the `node_modules` directory, we use `npm run package` to compile the action
-into a single file.
-
-This approach is inspired by the [javascript-action](https://github.com/actions/javascript-action)
-repository.
 
 ## Crates.io docs
 
