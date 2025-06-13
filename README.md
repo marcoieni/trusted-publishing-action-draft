@@ -7,6 +7,10 @@ Remember:
 - You must have configured your crate
 - You already published the first version of your crate (todo: is this only true now and will be fixed eventually?)
 
+You can read the token from the actions output `token` and use it in the subsequent steps.
+
+The `post` step of the action will revoke the token, so that it cannot be used after the job is done.
+
 ## Usage
 
 ```yaml
@@ -51,6 +55,26 @@ registry URL in the `url` input:
 ```
 
 Note that the registry must support OpenID Connect authentication.
+
+## Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant GW as GitHub Workflow
+    participant GH as github.com
+    participant CR as crates.io
+
+
+    GW->>GH: Request JWT token
+    GH-->>GW: Return JWT token
+
+    GW->>CR: Send JWT
+    CR-->>GW: Return temporary token
+
+    GW->>GW: User uses the temporary token in their steps
+
+    GW->>CR: Revoke temporary token
+```
 
 ## TODO
 
