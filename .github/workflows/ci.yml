@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "main"
@@ -41,6 +42,22 @@ jobs:
           # Don't use GitHub advanced security.
           # Instead, fail if there's a security issue.
           advanced-security: false
+
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check is packaged
+        run: |
+          # Compile to single js files
+          npm run package
+
+          # Assert that the git diff is empty
+          git diff --exit-code || (echo "Git diff is not empty. Please run 'npm run package' and commit the changes." && exit 1)
 
   test:
     runs-on: ubuntu-24.04
