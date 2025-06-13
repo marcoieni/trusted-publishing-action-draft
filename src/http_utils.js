@@ -1,4 +1,4 @@
-export async function throwErrorMessage(operation, response) {
+export async function throwHttpErrorMessage(operation, response) {
     const responseText = await response.text();
     let errorMessage = `${operation}. Status: ${response.status}.`;
     if (responseText) {

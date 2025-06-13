@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { getTokensEndpoint, throwErrorMessage } from "./http_utils.js";
+import { getTokensEndpoint, throwHttpErrorMessage } from "./http_utils.js";
 
 async function revokeToken(registryUrl, token) {
     const tokensEndpoint = getTokensEndpoint(registryUrl);
@@ -15,7 +15,7 @@ async function revokeToken(registryUrl, token) {
     });
 
     if (!response.ok) {
-        await throwErrorMessage("Failed to revoke token", response);
+        await throwHttpErrorMessage("Failed to revoke token", response);
     }
 
     core.info("Token revoked successfully");

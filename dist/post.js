@@ -27246,7 +27246,7 @@ function requireCore () {
 
 var coreExports = requireCore();
 
-async function throwErrorMessage(operation, response) {
+async function throwHttpErrorMessage(operation, response) {
     const responseText = await response.text();
     let errorMessage = `${operation}. Status: ${response.status}.`;
     if (responseText) {
@@ -27274,7 +27274,7 @@ async function revokeToken(registryUrl, token) {
     });
 
     if (!response.ok) {
-        await throwErrorMessage("Failed to revoke token", response);
+        await throwHttpErrorMessage("Failed to revoke token", response);
     }
 
     coreExports.info("Token revoked successfully");
