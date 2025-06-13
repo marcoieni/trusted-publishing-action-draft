@@ -34,10 +34,9 @@ export default defineConfig([
             "@typescript-eslint/sort-type-constituents": "error",
             "@typescript-eslint/no-confusing-void-expression": "error",
             "@typescript-eslint/consistent-type-imports": "error",
-            curly: "warn",
-            eqeqeq: "warn",
-            "no-throw-literal": "warn",
-            semi: "off",
+            curly: "error",
+            eqeqeq: "error",
+            "no-throw-literal": "error",
         },
     },
     {

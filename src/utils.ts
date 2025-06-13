@@ -14,7 +14,7 @@ export function getTokensEndpoint(registryUrl: string): string {
     return `${registryUrl}/api/v1/trusted_publishing/tokens`;
 }
 
-export function runAction(fn: () => void | Promise<void>): void {
+export function runAction(fn: () => Promise<void> | void): void {
     try {
         fn();
     } catch (error) {
