@@ -1,7 +1,27 @@
 import * as core from "@actions/core";
 import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
 
+runAction(cleanup);
+
+async function cleanup(): Promise<void> {
+    // Retrieve the token and registry URL from the action state.
+    // These values are set in the main job.
+    const token = core.getState("token");
+    const registryUrl = core.getState("registryUrl");
+
+    if (!token) {
+        // Probably the action terminated before the token was retrieved.
+        core.info("No token to revoke");
+        return;
+    }
+
+    // Revoke token so that even if it's leaked, it cannot be used anymore.
+    await revokeToken(registryUrl, token);
+}
+
 async function revokeToken(registryUrl: string, token: string): Promise<void> {
+    core.info("Revoking trusted publishing token");
+
     const tokensEndpoint = getTokensEndpoint(registryUrl);
 
     core.info(`Revoking token at: ${tokensEndpoint}`);
@@ -20,19 +40,3 @@ async function revokeToken(registryUrl: string, token: string): Promise<void> {
 
     core.info("Token revoked successfully");
 }
-
-async function cleanup(): Promise<void> {
-    const token = core.getState("token");
-    const registryUrl = core.getState("registryUrl");
-
-    if (!token) {
-        core.info("No token to revoke");
-        return;
-    }
-
-    core.info("Revoking trusted publishing token");
-
-    await revokeToken(registryUrl, token);
-}
-
-runAction(cleanup);
