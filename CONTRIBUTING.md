@@ -8,20 +8,21 @@ You can't run or test this action locally because it requires a GitHub environme
 
 The code of the action is in `src/`.
 After you edit the code, run the following command to
-compile the javascript code and its dependencies into a single file in the `dist/` directory:
+compile the typescript code and its dependencies into a single typescript
+file in the `dist/` directory:
 
 ```bash
 npm run package
 ```
 
-This approach is inspired by the [javascript-action](https://github.com/actions/javascript-action)
+This approach is inspired by the [typescript-action](https://github.com/actions/typescript-action)
 repository and it's used to avoid committing the `node_modules` directory to the repository.
 
 ### Format and lint
 
-#### JavaScript
+#### Typescript
 
-We use [Biome](https://biomejs.dev/) for formatting and linting javascript.
+We use [Biome](https://biomejs.dev/) for formatting and linting typescript.
 
 To format and fix lints, run:
 
@@ -53,7 +54,7 @@ Here are some useful links to the GitHub documentation:
 
 ## FAQ
 
-### Why javascript?
+### Why typescript?
 
 There are 3 types of GitHub Actions:
 
@@ -66,9 +67,6 @@ There are 3 types of GitHub Actions:
    - GitHub provides the `@actions/core` library to easily set outputs and handle errors.
 
 So we opted for a JavaScript Action.
+We use TypeScript to have type safety.
 
 [runs.post]: https://docs.github.com/en/actions/sharing-automations/creating-actions/metadata-syntax-for-github-actions#runspost
-
-### Why not typescript?
-
-The code is simple enough that we can avoid the complexity of TypeScript.
