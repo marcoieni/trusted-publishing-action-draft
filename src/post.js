@@ -1,12 +1,12 @@
 import * as core from "@actions/core";
-import { throwErrorMessage } from "./registry_error.js";
+import { getTokensEndpoint, throwErrorMessage } from "./http_utils.js";
 
 async function revokeToken(registryUrl, token) {
-    const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens`;
+    const tokensEndpoint = getTokensEndpoint(registryUrl);
 
-    core.info(`Revoking token at: ${revokeUrl}`);
+    core.info(`Revoking token at: ${tokensEndpoint}`);
 
-    const response = await fetch(revokeUrl, {
+    const response = await fetch(tokensEndpoint, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
