@@ -15,6 +15,9 @@ npx @biomejs/biome check --write
 To avoid committing the `node_modules` directory, we use `npm run package` to compile the action
 into a single file.
 
+This approach is inspired by the [javascript-action](https://github.com/actions/javascript-action)
+repository.
+
 ## Crates.io docs
 
 To check the Crates.io OpenAPI documentation,
