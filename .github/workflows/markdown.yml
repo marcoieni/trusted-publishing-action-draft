@@ -11,6 +11,8 @@ on:
     paths-ignore:
       - "**.md"
 
+permissions: {}
+
 jobs:
   markdown:
     runs-on: ubuntu-24.04
