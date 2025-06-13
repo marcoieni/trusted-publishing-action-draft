@@ -27246,6 +27246,33 @@ function requireCore () {
 
 var coreExports = requireCore();
 
+async function setRegistryError(operation, response) {
+    const errorText = await response.text();
+    coreExports.setFailed(`${operation}. Status: ${response.status}. Response: ${errorText}`);
+}
+
+async function revokeToken(registryUrl, token) {
+    const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens/revoke`;
+
+    try {
+        const response = await fetch(revokeUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (response.ok) {
+            coreExports.info("Token revoked successfully");
+        } else {
+            setRegistryError("Failed to revoke token", response);
+        }
+    } catch (error) {
+        coreExports.warning(`Failed to revoke token: ${error.message}`);
+    }
+}
+
 async function cleanup() {
     try {
         const token = coreExports.getState("token");
@@ -27258,26 +27285,7 @@ async function cleanup() {
 
         coreExports.info("Revoking trusted publishing token");
 
-        // Attempt to revoke the token (if the registry supports it)
-        const revokeUrl = `${registryUrl}/api/v1/trusted_publishing/tokens/revoke`;
-
-        try {
-            const response = await fetch(revokeUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (response.ok) {
-                coreExports.info("Token revoked successfully");
-            } else {
-                coreExports.warning(`Failed to revoke token. Status: ${response.status}`);
-            }
-        } catch (error) {
-            coreExports.warning(`Failed to revoke token: ${error.message}`);
-        }
+        await revokeToken(registryUrl, token);
     } catch (error) {
         coreExports.warning(`Cleanup failed: ${error.message}`);
     }
