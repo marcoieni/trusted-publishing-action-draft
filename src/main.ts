@@ -1,16 +1,35 @@
 import * as core from "@actions/core";
 import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
+import { getRegistryUrl, getAudienceFromUrl } from "./registry_url.js";
 
-function getRegistryUrl(): string {
-    const url = core.getInput("url") || "https://crates.io";
+runAction(run);
 
-    // Remove trailing `/` at the end of the URL if present
-    if (url.endsWith("/")) {
-        return url.slice(0, -1);
+async function run(): Promise<void> {
+    // Check if permissions are set correctly
+    if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
+        throw new Error(
+            "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
+        );
     }
 
-    return url;
+    const registryUrl = getRegistryUrl();
+
+    const audience = getAudienceFromUrl(registryUrl);
+
+    // Get the GitHub Actions JWT token, used to prove where the GitHub workflow is running
+    const jwtToken = await getJwtToken(audience);
+
+    // Retrieve the temporary token from the Cargo registry
+    const token = await requestTrustedPublishingToken(registryUrl, jwtToken);
+
+    // Set the token as output, so that users can access it in subsequent workflow steps
+    setTokenOutput(token);
+
+    // Store state used in the post job to revoke the token
+    core.saveState("token", token);
+    core.saveState("registryUrl", registryUrl);
 }
+
 
 async function getJwtToken(audience: string): Promise<string> {
     core.info(`Retrieving GitHub Actions JWT token with audience: ${audience}`);
@@ -61,42 +80,3 @@ function setTokenOutput(token: string): void {
     core.setOutput("token", token);
 
 }
-
-// Extract audience from registry URL by removing `https://` or `http://`
-function getAudienceFromUrl(url: string): string {
-    const audience = url.replace(/^https?:\/\//, "");
-
-    if (audience.startsWith("http://") || audience.startsWith("https://")) {
-        throw new Error("Bug: The audience should not include the protocol (http:// or https://).");
-    }
-
-    return audience;
-}
-
-async function run(): Promise<void> {
-    // Check if permissions are set correctly
-    if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
-        throw new Error(
-            "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
-        );
-    }
-
-    const registryUrl = getRegistryUrl();
-
-    const audience = getAudienceFromUrl(registryUrl);
-
-    // Get the GitHub Actions JWT token, used to prove where the GitHub workflow is running
-    const jwtToken = await getJwtToken(audience);
-
-    // Retrieve the temporary token from the Cargo registry
-    const token = await requestTrustedPublishingToken(registryUrl, jwtToken);
-
-    // Set the token as output, so that users can access it in subsequent workflow steps
-    setTokenOutput(token);
-
-    // Store state used in the post job to revoke the token
-    core.saveState("token", token);
-    core.saveState("registryUrl", registryUrl);
-}
-
-runAction(run);
