@@ -25,7 +25,7 @@ jobs:
       - name: Check
         run: |
           # Check format and lint
-          npm run check
+          npx @biomejs/biome check
 
   zizmor:
     runs-on: ubuntu-24.04

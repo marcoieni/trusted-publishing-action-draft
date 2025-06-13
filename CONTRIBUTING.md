@@ -19,12 +19,23 @@ repository and it's used to avoid committing the `node_modules` directory to the
 
 ### Format and lint
 
-We use [Biome](https://biomejs.dev/) for formatting and linting.
+#### JavaScript
+
+We use [Biome](https://biomejs.dev/) for formatting and linting javascript.
 
 To format and fix lints, run:
 
 ```bash
 npx @biomejs/biome check --write
+```
+
+#### Markdown
+
+WE use [Prettier](https://prettier.io/) for formatting markdown files.
+To format markdown files, run:
+
+```bash
+npx prettier --write '**/*.md'
 ```
 
 ## Crates.io docs
@@ -36,6 +47,7 @@ in the [swagger](https://petstore.swagger.io/) bar at the top of the page.
 ## GitHub docs
 
 Here are some useful links to the GitHub documentation:
+
 - [Creating a javascript action](https://docs.github.com/en/actions/sharing-automations/creating-actions/creating-a-javascript-action)
 - [OpenID Connect](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
 

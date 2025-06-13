@@ -3,6 +3,7 @@
 Get a temporary access token that you can use to interact with crates.io.
 
 Remember:
+
 - You must have configured your crate
 - You already published the first version of your crate (todo: is this only true now and will be fixed eventually?)
 
@@ -23,17 +24,17 @@ jobs:
       id-token: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Authenticate with crates.io
-      id: auth
-      uses: rust-lang/crates-io-auth-action@v1
+      - name: Authenticate with crates.io
+        id: auth
+        uses: rust-lang/crates-io-auth-action@v1
 
-    - name: Publish to crates.io
-      run: cargo publish
-      env:
-        CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+      - name: Publish to crates.io
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 ```
 
 ## TODO
