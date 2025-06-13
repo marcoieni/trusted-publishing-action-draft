@@ -2,7 +2,7 @@
 
 use axum::{
     Router,
-    http::StatusCode,
+    http::{HeaderMap, StatusCode},
     response::Json,
     routing::{delete, get, put},
 };
@@ -15,6 +15,8 @@ struct TokenRequest {
     _jwt: String,
 }
 
+const TOKEN: &str = "mock-token";
+
 #[derive(Serialize)]
 struct TokenResponse {
     token: String,
@@ -22,13 +24,22 @@ struct TokenResponse {
 
 async fn get_token(Json(_payload): Json<TokenRequest>) -> Result<Json<TokenResponse>, StatusCode> {
     let response = TokenResponse {
-        token: "mock-token".to_string(),
+        token: TOKEN.to_string(),
     };
     Ok(Json(response))
 }
 
-async fn revoke_token() -> Result<StatusCode, ()> {
-    Ok(StatusCode::NO_CONTENT)
+async fn revoke_token(headers: HeaderMap) -> Result<StatusCode, StatusCode> {
+    match headers.get("authorization") {
+        Some(auth_header) => {
+            if auth_header == &format!("Bearer {TOKEN}") {
+                Ok(StatusCode::NO_CONTENT)
+            } else {
+                Err(StatusCode::UNAUTHORIZED)
+            }
+        }
+        None => Err(StatusCode::UNAUTHORIZED),
+    }
 }
 
 async fn health() -> Result<(), StatusCode> {
@@ -37,7 +48,7 @@ async fn health() -> Result<(), StatusCode> {
 
 #[tokio::main]
 async fn main() {
-    let tokens_endpoint ="/api/v1/trusted_publishing/tokens";
+    let tokens_endpoint = "/api/v1/trusted_publishing/tokens";
     let app = Router::new()
         .route(tokens_endpoint, put(get_token))
         .route(tokens_endpoint, delete(revoke_token))
