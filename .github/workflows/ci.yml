@@ -27,7 +27,7 @@ jobs:
 
       - name: Lint
         run: |
-          npx @eslint src
+          npx eslint src
 
   zizmor:
     runs-on: ubuntu-24.04
