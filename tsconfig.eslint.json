@@ -4,5 +4,5 @@
     "compilerOptions": {
         "allowJs": true,
         "noEmit": true
-    },
+    }
 }
