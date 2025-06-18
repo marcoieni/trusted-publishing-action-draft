@@ -29,7 +29,7 @@ npx prettier --write .
 
 ### Linting
 
-We use [ESLint](https://eslint.org/) for formatting and linting typescript.
+We use [ESLint](https://eslint.org/) for formatting and linting typescript files.
 
 To check for linting errors, run:
 
