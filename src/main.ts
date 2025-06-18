@@ -1,12 +1,20 @@
 import * as core from "@actions/core";
 import { getAudienceFromUrl, getRegistryUrl } from "./registry_url.js";
-import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
+import {
+    getTokensEndpoint,
+    jsonContentType,
+    runAction,
+    throwHttpErrorMessage,
+} from "./utils.js";
 
 runAction(run);
 
 async function run(): Promise<void> {
     // Check if permissions are set correctly.
-    if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
+    if (
+        process.env.ACTIONS_ID_TOKEN_REQUEST_URL === undefined ||
+        !process.env.ACTIONS_ID_TOKEN_REQUEST_URL
+    ) {
         throw new Error(
             "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
         );
@@ -52,15 +60,16 @@ async function requestTrustedPublishingToken(
 
     const response = await fetch(tokenUrl, {
         method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: jsonContentType(),
         body: JSON.stringify({ jwt: jwtToken }),
     });
 
     if (!response.ok) {
         // Status is not in the range 200-299.
-        await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
+        await throwHttpErrorMessage(
+            "Failed to retrieve token from Cargo registry",
+            response,
+        );
     }
     const tokenResponse = (await response.json()) as { token: string };
 

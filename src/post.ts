@@ -1,5 +1,10 @@
 import * as core from "@actions/core";
-import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
+import {
+    getTokensEndpoint,
+    jsonContentType,
+    runAction,
+    throwHttpErrorMessage,
+} from "./utils.js";
 
 runAction(cleanup);
 
@@ -29,7 +34,8 @@ async function revokeToken(registryUrl: string, token: string): Promise<void> {
     const response = await fetch(tokensEndpoint, {
         method: "DELETE",
         headers: {
-            "Content-Type": "application/json",
+            ...jsonContentType(),
+            /* eslint-disable  @typescript-eslint/naming-convention */
             Authorization: `Bearer ${token}`,
         },
     });
