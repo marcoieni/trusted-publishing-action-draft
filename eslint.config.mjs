@@ -2,11 +2,9 @@ import { defineConfig } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-function project() {
-    return {
-        project: ["tsconfig.eslint.json"],
-    };
-}
+const esLintProject = {
+    project: ["tsconfig.eslint.json"],
+};
 
 /* eslint-disable  @typescript-eslint/naming-convention */
 export default defineConfig([
@@ -23,7 +21,7 @@ export default defineConfig([
             globals: globals.node,
             // This enables type-aware linting
             parserOptions: {
-                ...project(),
+                ...esLintProject,
                 tsconfigRootDir: import.meta.dirname,
             },
         },
@@ -50,7 +48,7 @@ export default defineConfig([
             "import/resolver": {
                 typescript: {
                     alwaysTryTypes: true,
-                    ...project(),
+                    ...esLintProject,
                 },
             },
         },
