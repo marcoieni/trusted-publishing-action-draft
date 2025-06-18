@@ -40,7 +40,6 @@ function checkPermissions(): void {
             "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
         );
     }
-
 }
 
 async function getJwtToken(audience: string): Promise<string> {
