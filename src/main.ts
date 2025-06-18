@@ -10,15 +10,7 @@ import {
 runAction(run);
 
 async function run(): Promise<void> {
-    // Check if permissions are set correctly.
-    if (
-        process.env.ACTIONS_ID_TOKEN_REQUEST_URL === undefined ||
-        !process.env.ACTIONS_ID_TOKEN_REQUEST_URL
-    ) {
-        throw new Error(
-            "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
-        );
-    }
+    checkPermissions();
 
     const registryUrl = getRegistryUrl();
 
@@ -36,6 +28,19 @@ async function run(): Promise<void> {
     // Store state used in the post job to revoke the token.
     core.saveState("token", token);
     core.saveState("registryUrl", registryUrl);
+}
+
+/** Check that GitHub Actions workflow permissions are set correctly. */
+function checkPermissions(): void {
+    if (
+        process.env.ACTIONS_ID_TOKEN_REQUEST_URL === undefined ||
+        !process.env.ACTIONS_ID_TOKEN_REQUEST_URL
+    ) {
+        throw new Error(
+            "Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings",
+        );
+    }
+
 }
 
 async function getJwtToken(audience: string): Promise<string> {
