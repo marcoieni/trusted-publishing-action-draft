@@ -85,3 +85,5 @@ sequenceDiagram
 - [ ] test that the token output is set as sensitive, if possible
 - [ ] configure automatic dependencies updates (renovate or dependabot)
 - [ ] add integration tests with snapshots to test error cases
+- [ ] add unit tests to test functions
+- [ ] new test in github actions where we test if permission is missing.
