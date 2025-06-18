@@ -1,5 +1,3 @@
-import js from "@eslint/js";
-import markdown from "@eslint/markdown";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -38,11 +36,5 @@ export default defineConfig([
             eqeqeq: "error",
             "no-throw-literal": "error",
         },
-    },
-    {
-        files: ["**/*.md"],
-        plugins: { markdown },
-        language: "markdown/gfm",
-        extends: ["markdown/recommended"],
     },
 ]);

@@ -18,25 +18,23 @@ npm run package
 This approach is inspired by the [typescript-action](https://github.com/actions/typescript-action)
 repository and it's used to avoid committing the `node_modules` directory to the repository.
 
-### Format and lint
+### Format
 
-#### Typescript
-
-We use [Biome](https://biomejs.dev/) for formatting and linting typescript.
-
-To format and fix lints, run:
+We use [Prettier](https://prettier.io/) for formatting typescript, markdown, and YAML files.
+To format all files, run:
 
 ```bash
-npx @biomejs/biome check --write
+npx prettier --write .
 ```
 
-#### Markdown
+### Linting
 
-WE use [Prettier](https://prettier.io/) for formatting markdown files.
-To format markdown files, run:
+We use [ESLint](https://eslint.org/) for formatting and linting typescript.
+
+To check for linting errors, run:
 
 ```bash
-npx prettier --write '**/*.md'
+npx eslint src
 ```
 
 ## Crates.io docs
