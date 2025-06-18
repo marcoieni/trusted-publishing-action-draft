@@ -2,18 +2,26 @@ import { defineConfig } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
+const esLintProject = {
+    project: ["tsconfig.eslint.json"],
+};
+
+/* eslint-disable  @typescript-eslint/naming-convention */
 export default defineConfig([
     ...tseslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,
     ...tseslint.configs.strict,
     ...tseslint.configs.strictTypeChecked,
     {
-        files: ["src/**/*.ts"],
+        ignores: ["**/dist", "**/node_modules"],
+    },
+    {
+        files: ["src/**/*.ts", "rollup.config.ts", "*.mjs"],
         languageOptions: {
             globals: globals.node,
             // This enables type-aware linting
             parserOptions: {
-                project: true,
+                ...esLintProject,
                 tsconfigRootDir: import.meta.dirname,
             },
         },
@@ -35,6 +43,14 @@ export default defineConfig([
             curly: "error",
             eqeqeq: "error",
             "no-throw-literal": "error",
+        },
+        settings: {
+            "import/resolver": {
+                typescript: {
+                    alwaysTryTypes: true,
+                    ...esLintProject,
+                },
+            },
         },
     },
 ]);

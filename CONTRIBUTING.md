@@ -34,7 +34,7 @@ We use [ESLint](https://eslint.org/) for formatting and linting typescript files
 To check for linting errors, run:
 
 ```bash
-npx eslint src
+npx eslint
 ```
 
 ## Crates.io docs

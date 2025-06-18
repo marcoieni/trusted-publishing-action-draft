@@ -27289,11 +27289,7 @@ function jsonContentType() {
 
 runAction(run);
 async function run() {
-    // Check if permissions are set correctly.
-    if (process.env.ACTIONS_ID_TOKEN_REQUEST_URL === undefined ||
-        !process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
-        throw new Error("Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings");
-    }
+    checkPermissions();
     const registryUrl = getRegistryUrl();
     const audience = getAudienceFromUrl(registryUrl);
     // Get the GitHub Actions JWT token, used to prove where the GitHub workflow is running.
@@ -27305,6 +27301,13 @@ async function run() {
     // Store state used in the post job to revoke the token.
     coreExports.saveState("token", token);
     coreExports.saveState("registryUrl", registryUrl);
+}
+/** Check that GitHub Actions workflow permissions are set correctly. */
+function checkPermissions() {
+    if (process.env.ACTIONS_ID_TOKEN_REQUEST_URL === undefined ||
+        !process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
+        throw new Error("Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings");
+    }
 }
 async function getJwtToken(audience) {
     coreExports.info(`Retrieving GitHub Actions JWT token with audience: ${audience}`);
