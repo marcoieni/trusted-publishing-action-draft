@@ -5,11 +5,7 @@ on:
   push:
     branches:
       - "main"
-    paths-ignore:
-      - "**.md"
   pull_request:
-    paths-ignore:
-      - "**.md"
 
 permissions: {}
 
@@ -28,6 +24,20 @@ jobs:
       - name: Lint
         run: |
           npx eslint src
+
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Prettier
+        run: npm ci
+
+      - name: Format
+        run: npx prettier --check .
 
   zizmor:
     runs-on: ubuntu-24.04
