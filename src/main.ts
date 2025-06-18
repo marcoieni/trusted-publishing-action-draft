@@ -10,6 +10,7 @@ import {
 runAction(run);
 
 async function run(): Promise<void> {
+    const aaa = "Hello, world!";
     // Check if permissions are set correctly.
     if (
         process.env.ACTIONS_ID_TOKEN_REQUEST_URL === undefined ||
