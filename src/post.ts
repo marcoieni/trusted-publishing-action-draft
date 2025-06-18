@@ -1,5 +1,10 @@
 import * as core from "@actions/core";
-import { getTokensEndpoint, jsonContentType, runAction, throwHttpErrorMessage } from "./utils.js";
+import {
+    getTokensEndpoint,
+    jsonContentType,
+    runAction,
+    throwHttpErrorMessage,
+} from "./utils.js";
 
 runAction(cleanup);
 

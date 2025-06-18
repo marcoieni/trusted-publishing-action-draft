@@ -1,6 +1,9 @@
 import * as core from "@actions/core";
 
-export async function throwHttpErrorMessage(operation: string, response: Response): Promise<void> {
+export async function throwHttpErrorMessage(
+    operation: string,
+    response: Response,
+): Promise<void> {
     const responseText = await response.text();
     let errorMessage = `${operation}. Status: ${response.status.toString()}.`;
     if (responseText) {
@@ -16,7 +19,8 @@ export function getTokensEndpoint(registryUrl: string): string {
 
 export function runAction(fn: () => Promise<void>): void {
     fn().catch((error: unknown) => {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         core.setFailed(`Error: ${errorMessage}`);
     });
 }

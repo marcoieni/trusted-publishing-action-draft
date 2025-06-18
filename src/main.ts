@@ -1,6 +1,10 @@
 import * as core from "@actions/core";
 import { getAudienceFromUrl, getRegistryUrl } from "./registry_url.js";
-import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
+import {
+    getTokensEndpoint,
+    runAction,
+    throwHttpErrorMessage,
+} from "./utils.js";
 import { jsonContentType } from "./utils.js";
 
 runAction(run);
@@ -62,7 +66,10 @@ async function requestTrustedPublishingToken(
 
     if (!response.ok) {
         // Status is not in the range 200-299.
-        await throwHttpErrorMessage("Failed to retrieve token from Cargo registry", response);
+        await throwHttpErrorMessage(
+            "Failed to retrieve token from Cargo registry",
+            response,
+        );
     }
     const tokenResponse = (await response.json()) as { token: string };
 

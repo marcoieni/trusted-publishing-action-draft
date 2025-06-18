@@ -5,7 +5,9 @@ export function getAudienceFromUrl(url: string): string {
     const audience = url.replace(/^https?:\/\//, "");
 
     if (audience.startsWith("http://") || audience.startsWith("https://")) {
-        throw new Error("Bug: The audience should not include the protocol (http:// or https://).");
+        throw new Error(
+            "Bug: The audience should not include the protocol (http:// or https://).",
+        );
     }
 
     return audience;

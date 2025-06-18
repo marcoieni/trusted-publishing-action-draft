@@ -13,7 +13,11 @@ function configBlock(filename) {
             format: "es",
             sourcemap: true,
         },
-        plugins: [typescript(), commonjs(), nodeResolve({ preferBuiltins: true })],
+        plugins: [
+            typescript(),
+            commonjs(),
+            nodeResolve({ preferBuiltins: true }),
+        ],
     };
 }
 
