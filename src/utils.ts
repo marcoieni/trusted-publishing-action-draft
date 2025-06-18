@@ -22,3 +22,9 @@ export function runAction(fn: () => Promise<void> | void): void {
         core.setFailed(`Error: ${errorMessage}`);
     }
 }
+
+export function jsonContentType() {
+    return {
+        "Content-Type": "application/json",
+    };
+}

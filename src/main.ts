@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import { getAudienceFromUrl, getRegistryUrl } from "./registry_url.js";
 import { getTokensEndpoint, runAction, throwHttpErrorMessage } from "./utils.js";
+import { jsonContentType } from "./utils.js";
 
 runAction(run);
 
@@ -52,9 +53,7 @@ async function requestTrustedPublishingToken(
 
     const response = await fetch(tokenUrl, {
         method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: jsonContentType(),
         body: JSON.stringify({ jwt: jwtToken }),
     });
 
