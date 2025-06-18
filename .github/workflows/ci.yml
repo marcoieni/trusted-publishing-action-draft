@@ -14,7 +14,7 @@ on:
 permissions: {}
 
 jobs:
-  check:
+  lint:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
@@ -22,10 +22,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check
+      - name: Install node dependencies
+        run: npm ci
+
+      - name: Lint
         run: |
-          # Check format and lint.
-          npx @biomejs/biome check
+          npx @eslint src
 
   zizmor:
     runs-on: ubuntu-24.04
