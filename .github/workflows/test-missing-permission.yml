@@ -1,0 +1,38 @@
+name: Test Missing ID Token Permission
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+  pull_request:
+
+permissions: {}
+
+jobs:
+  test-id-token:
+    runs-on: ubuntu-24.04
+
+    # Intentionally NOT setting id-token: write permission
+    # to test that the action fails in this case.
+    permissions: {}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run trusted publishing action (should fail)
+        id: trusted-publishing
+        uses: ./ # Uses the action in the root directory.
+        continue-on-error: true # Allow the step to fail so we can check the error
+
+      - name: Assert action failed with expected error message
+        run: |
+          if [ "${{ steps.trusted-publishing.outcome }}" != "failure" ]; then
+            echo "ERROR: Expected action outcome to be 'failure' but got '${{ steps.trusted-publishing.outcome }}'"
+            exit 1
+          fi
+
+          echo "Test passed: Action failed as expected when id-token permission is missing"
