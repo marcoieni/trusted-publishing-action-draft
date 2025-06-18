@@ -27265,7 +27265,7 @@ function getRegistryUrl() {
 
 async function throwHttpErrorMessage(operation, response) {
     const responseText = await response.text();
-    let errorMessage = `${operation}. Status: ${response.status}.`;
+    let errorMessage = `${operation}. Status: ${response.status.toString()}.`;
     if (responseText) {
         errorMessage += ` Response: ${responseText}`;
     }
@@ -27275,19 +27275,23 @@ function getTokensEndpoint(registryUrl) {
     return `${registryUrl}/api/v1/trusted_publishing/tokens`;
 }
 function runAction(fn) {
-    try {
-        fn();
-    }
-    catch (error) {
+    fn().catch((error) => {
         const errorMessage = error instanceof Error ? error.message : String(error);
         coreExports.setFailed(`Error: ${errorMessage}`);
-    }
+    });
+}
+function jsonContentType() {
+    return {
+        /* eslint-disable  @typescript-eslint/naming-convention */
+        "Content-Type": "application/json",
+    };
 }
 
 runAction(run);
 async function run() {
     // Check if permissions are set correctly.
-    if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
+    if (process.env.ACTIONS_ID_TOKEN_REQUEST_URL === undefined ||
+        !process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
         throw new Error("Please ensure the 'id-token' permission is set to 'write' in your workflow. For more information, see: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings");
     }
     const registryUrl = getRegistryUrl();
@@ -27316,9 +27320,7 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
     coreExports.info(`Requesting token from: ${tokenUrl}`);
     const response = await fetch(tokenUrl, {
         method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: jsonContentType(),
         body: JSON.stringify({ jwt: jwtToken }),
     });
     if (!response.ok) {

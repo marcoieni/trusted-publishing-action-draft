@@ -27248,7 +27248,7 @@ var coreExports = requireCore();
 
 async function throwHttpErrorMessage(operation, response) {
     const responseText = await response.text();
-    let errorMessage = `${operation}. Status: ${response.status}.`;
+    let errorMessage = `${operation}. Status: ${response.status.toString()}.`;
     if (responseText) {
         errorMessage += ` Response: ${responseText}`;
     }
@@ -27258,13 +27258,16 @@ function getTokensEndpoint(registryUrl) {
     return `${registryUrl}/api/v1/trusted_publishing/tokens`;
 }
 function runAction(fn) {
-    try {
-        fn();
-    }
-    catch (error) {
+    fn().catch((error) => {
         const errorMessage = error instanceof Error ? error.message : String(error);
         coreExports.setFailed(`Error: ${errorMessage}`);
-    }
+    });
+}
+function jsonContentType() {
+    return {
+        /* eslint-disable  @typescript-eslint/naming-convention */
+        "Content-Type": "application/json",
+    };
 }
 
 runAction(cleanup);
@@ -27288,7 +27291,8 @@ async function revokeToken(registryUrl, token) {
     const response = await fetch(tokensEndpoint, {
         method: "DELETE",
         headers: {
-            "Content-Type": "application/json",
+            ...jsonContentType(),
+            /* eslint-disable  @typescript-eslint/naming-convention */
             Authorization: `Bearer ${token}`,
         },
     });
