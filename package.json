@@ -4,7 +4,9 @@
     "description": "Get a temporary access token that you can use to interact with crates.io.",
     "private": true,
     "scripts": {
-        "package": "npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript"
+        "package": "npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+        "format": "npx prettier --write .",
+        "lint": "npx eslint src"
     },
     "engines": {
         "node": ">=20"
