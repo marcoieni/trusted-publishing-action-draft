@@ -30,6 +30,7 @@ async function revokeToken(registryUrl: string, token: string): Promise<void> {
         method: "DELETE",
         headers: {
             ...jsonContentType(),
+            /* eslint-disable  @typescript-eslint/naming-convention */
             Authorization: `Bearer ${token}`,
         },
     });
