@@ -2,10 +2,10 @@ import * as core from "@actions/core";
 import { getAudienceFromUrl, getRegistryUrl } from "./registry_url.js";
 import {
     getTokensEndpoint,
+    jsonContentType,
     runAction,
     throwHttpErrorMessage,
 } from "./utils.js";
-import { jsonContentType } from "./utils.js";
 
 runAction(run);
 
