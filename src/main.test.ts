@@ -62,7 +62,7 @@ describe("Main Action Tests", () => {
         vi.mocked(core.getIDToken).mockResolvedValue("");
 
         await expect(main.run()).rejects.toThrowError(
-            "Failed to retrieve JWT token from GitHub Actions"
+            "Failed to retrieve JWT token from GitHub Actions",
         );
     });
 });
