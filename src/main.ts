@@ -9,7 +9,7 @@ import {
 
 runAction(run);
 
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
     checkPermissions();
 
     const registryUrl = getRegistryUrl();
