@@ -17,7 +17,9 @@ vi.mock("@actions/core", () => ({
 // Import the mocked core module
 import * as core from "@actions/core";
 
-const REGISTRY_URL = "https://my-crates.io";
+const AUDIENCE = "my-crates.io";
+const REGISTRY_URL = `https://${AUDIENCE}`;
+const TOKENS_URL = `${REGISTRY_URL}/api/v1/trusted_publishing/tokens`;
 
 describe("Main Action Tests", () => {
     let originalEnvValue: string | undefined;
@@ -76,7 +78,7 @@ describe("Main Action Tests", () => {
 
         // Setup MSW server to mock the registry endpoint with 400 error
         const handlers = [
-            http.put(`${REGISTRY_URL}/api/v1/trusted_publishing/tokens`, () => {
+            http.put(TOKENS_URL, () => {
                 return HttpResponse.json(
                     {
                         errors: [
@@ -95,6 +97,46 @@ describe("Main Action Tests", () => {
         await expect(main.run()).rejects.toThrowError(
             `Failed to retrieve token from Cargo registry. Status: 400. Response: {"errors":[{"detail":"No matching Trusted Publishing config found"}]}`,
         );
+        server.close();
+
+        // Reset MSW server handlers
+        server.resetHandlers();
+    });
+
+    test("should successfully retrieve token and save state in happy path", async () => {
+        // Set up environment variable so we pass the permissions check
+        setRegistryUrl();
+
+        const expectedToken = "cargo-registry-token";
+
+        // Setup MSW server to mock the registry endpoint with successful response
+        const handlers = [
+            http.put(TOKENS_URL, () => {
+                return HttpResponse.json(
+                    { token: expectedToken },
+                    { status: 200 },
+                );
+            }),
+        ];
+        const server = msw.setupServer(...handlers);
+        server.listen({ onUnhandledRequest: "error" });
+
+        // Run the main function
+        await main.run();
+
+        // Verify that setOutput was called with the token
+        expect(core.setOutput).toHaveBeenCalledWith("token", expectedToken);
+
+        // Verify that setSecret was called to mask the token in logs
+        expect(core.setSecret).toHaveBeenCalledWith(expectedToken);
+
+        // Verify that saveState was called with the correct token and registry URL
+        expect(core.saveState).toHaveBeenCalledWith("token", expectedToken);
+        expect(core.saveState).toHaveBeenCalledWith("registryUrl", REGISTRY_URL);
+
+        // Verify that getIDToken was called with the correct audience
+        expect(core.getIDToken).toHaveBeenCalledWith(AUDIENCE);
+
         server.close();
 
         // Reset MSW server handlers
