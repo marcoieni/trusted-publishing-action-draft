@@ -27342,4 +27342,6 @@ function setTokenOutput(token) {
     coreExports.setSecret(token);
     coreExports.setOutput("token", token);
 }
+
+export { run };
 //# sourceMappingURL=main.js.map
