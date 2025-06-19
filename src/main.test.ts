@@ -1,4 +1,6 @@
 import { expect, test, vi, beforeEach, afterEach, describe } from "vitest";
+import { http, HttpResponse } from "msw";
+import * as msw from "msw/node";
 import * as main from "./main.js";
 
 // Mock the @actions/core module
@@ -15,6 +17,8 @@ vi.mock("@actions/core", () => ({
 // Import the mocked core module
 import * as core from "@actions/core";
 
+const REGISTRY_URL = "https://my-crates.io";
+
 describe("Main Action Tests", () => {
     let originalEnvValue: string | undefined;
 
@@ -29,7 +33,7 @@ describe("Main Action Tests", () => {
         delete process.env.ACTIONS_ID_TOKEN_REQUEST_URL;
 
         // Setup default mock implementations
-        vi.mocked(core.getInput).mockReturnValue("https://example.com"); // Default registry URL
+        vi.mocked(core.getInput).mockReturnValue(REGISTRY_URL); // Default registry URL
         vi.mocked(core.getIDToken).mockResolvedValue("mock-jwt-token");
         vi.mocked(core.setOutput).mockImplementation(() => {});
         vi.mocked(core.setSecret).mockImplementation(() => {});
@@ -56,7 +60,7 @@ describe("Main Action Tests", () => {
 
     test("should throw error when getIDToken returns empty string", async () => {
         // Set up environment variable so we pass the permissions check
-        process.env.ACTIONS_ID_TOKEN_REQUEST_URL = "https://example.com";
+        setRegistryUrl();
 
         // Mock getIDToken to return empty string
         vi.mocked(core.getIDToken).mockResolvedValue("");
@@ -65,4 +69,41 @@ describe("Main Action Tests", () => {
             "Failed to retrieve JWT token from GitHub Actions",
         );
     });
+
+    test("should throw error when registry returns 400 with no matching config", async () => {
+        // Set up environment variable so we pass the permissions check
+        setRegistryUrl();
+
+        // Setup MSW server to mock the registry endpoint with 400 error
+        const handlers = [
+
+            http.put(`${REGISTRY_URL}/api/v1/trusted_publishing/tokens`, () => {
+                return HttpResponse.json(
+                    {
+                        errors: [
+                            {
+                                detail: "No matching Trusted Publishing config found",
+                            },
+                        ],
+                    },
+                    { status: 400 },
+                );
+            }),
+        ];
+        const server = msw.setupServer(...handlers);
+        server.listen({ onUnhandledRequest: "error" });
+
+        await expect(main.run()).rejects.toThrowError(
+            `Failed to retrieve token from Cargo registry. Status: 400. Response: {"errors":[{"detail":"No matching Trusted Publishing config found"}]}`,
+        );
+        server.close();
+
+        // Reset MSW server handlers
+        server.resetHandlers();
+    });
 });
+
+function setRegistryUrl(): void {
+    // Set the registry URL in the environment variable
+    process.env.ACTIONS_ID_TOKEN_REQUEST_URL = REGISTRY_URL;
+}
