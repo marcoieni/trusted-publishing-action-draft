@@ -85,6 +85,5 @@ sequenceDiagram
 - [ ] configure automatic dependencies updates (renovate or dependabot)
 - [ ] add integration tests with snapshots to test error cases
 - [ ] add unit tests to test functions
-- [ ] new test in github actions where we test if permission is missing.
 - [ ] write author in action.yml
 - [ ] fix warnings when running `npm run package`
