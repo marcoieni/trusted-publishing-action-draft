@@ -16,9 +16,9 @@ export default defineConfig([
         ignores: ["**/dist", "**/node_modules"],
     },
     {
-        files: ["src/**/*.ts", "rollup.config.ts", "*.mjs"],
+        files: ["src/**/*.ts", "rollup.config.ts", "jest.config.js", "*.mjs"],
         languageOptions: {
-            globals: globals.node,
+            globals: { ...globals.node, ...globals.jest },
             // This enables type-aware linting
             parserOptions: {
                 ...esLintProject,
