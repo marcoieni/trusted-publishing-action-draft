@@ -132,7 +132,10 @@ describe("Main Action Tests", () => {
 
         // Verify that saveState was called with the correct token and registry URL
         expect(core.saveState).toHaveBeenCalledWith("token", expectedToken);
-        expect(core.saveState).toHaveBeenCalledWith("registryUrl", REGISTRY_URL);
+        expect(core.saveState).toHaveBeenCalledWith(
+            "registryUrl",
+            REGISTRY_URL,
+        );
 
         // Verify that getIDToken was called with the correct audience
         expect(core.getIDToken).toHaveBeenCalledWith(AUDIENCE);
