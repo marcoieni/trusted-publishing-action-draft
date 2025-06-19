@@ -76,7 +76,6 @@ describe("Main Action Tests", () => {
 
         // Setup MSW server to mock the registry endpoint with 400 error
         const handlers = [
-
             http.put(`${REGISTRY_URL}/api/v1/trusted_publishing/tokens`, () => {
                 return HttpResponse.json(
                     {
