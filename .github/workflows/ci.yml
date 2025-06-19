@@ -89,7 +89,7 @@ jobs:
           # Assert that the git diff is empty.
           git diff --exit-code || (echo "Git diff is not empty. Please run 'npm run package' and commit the changes." && exit 1)
 
-  test:
+  integration-test:
     runs-on: ubuntu-24.04
 
     # Required for OpenID Connect token retrieval.
