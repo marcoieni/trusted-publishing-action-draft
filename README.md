@@ -82,7 +82,6 @@ sequenceDiagram
 - [ ] add retry logic?
 - [ ] write more docs or link to more docs
 - [ ] add license
-- [ ] test that the token output is set as sensitive, if possible
 - [ ] configure automatic dependencies updates (renovate or dependabot)
 - [ ] add integration tests with snapshots to test error cases
 - [ ] add unit tests to test functions
