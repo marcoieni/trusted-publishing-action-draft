@@ -10,6 +10,21 @@ on:
 permissions: {}
 
 jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install node dependencies
+        run: npm ci
+
+      - name: Test
+        run: |
+          npm run test
+
   lint:
     runs-on: ubuntu-24.04
     steps:
@@ -23,7 +38,7 @@ jobs:
 
       - name: Lint
         run: |
-          npx eslint src
+          npm run lint
 
   format:
     runs-on: ubuntu-24.04
@@ -74,7 +89,7 @@ jobs:
           # Assert that the git diff is empty.
           git diff --exit-code || (echo "Git diff is not empty. Please run 'npm run package' and commit the changes." && exit 1)
 
-  test:
+  integration-test:
     runs-on: ubuntu-24.04
 
     # Required for OpenID Connect token retrieval.
