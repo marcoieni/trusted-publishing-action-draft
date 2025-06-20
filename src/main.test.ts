@@ -2,6 +2,9 @@ import { expect, test, vi, beforeEach, afterEach, describe } from "vitest";
 import { http, HttpResponse } from "msw";
 import * as main from "./main.js";
 import * as post from "./post.js";
+import * as core from "@actions/core";
+import type * as msw from "msw/node";
+import { startMockServer } from "./test_utils.js";
 
 // Mock the @actions/core module
 vi.mock("@actions/core", () => ({
@@ -15,10 +18,6 @@ vi.mock("@actions/core", () => ({
     getState: vi.fn(),
 }));
 
-// Import the mocked core module
-import * as core from "@actions/core";
-import { startMockServer } from "./test_utils.js";
-
 const AUDIENCE = "my-crates.io";
 const REGISTRY_URL = `https://${AUDIENCE}`;
 const TOKENS_URL = `${REGISTRY_URL}/api/v1/trusted_publishing/tokens`;
@@ -28,6 +27,7 @@ const EXPECTED_TOKEN = "cargo-registry-token";
 describe("Main Action Tests", () => {
     let originalEnvValue: string | undefined;
     const state = new Map<string, string>();
+    let server: msw.SetupServer | null = null;
 
     beforeEach(() => {
         // Reset all mocks before each test
@@ -63,6 +63,11 @@ describe("Main Action Tests", () => {
         } else {
             delete process.env.ACTIONS_ID_TOKEN_REQUEST_URL;
         }
+
+        if (server) {
+            server.close();
+            server.resetHandlers();
+        }
     });
 
     test("permissions check fail if env var not set", async () => {
@@ -73,7 +78,6 @@ describe("Main Action Tests", () => {
     });
 
     test("should throw error when getIDToken returns empty string", async () => {
-        // Set up environment variable so we pass the permissions check
         setRegistryUrl();
 
         // Mock getIDToken to return empty string
@@ -85,11 +89,10 @@ describe("Main Action Tests", () => {
     });
 
     test("should throw error when registry returns 400 with no matching config", async () => {
-        // Set up environment variable so we pass the permissions check
         setRegistryUrl();
 
-        // Setup MSW server to mock the registry endpoint with 400 error
-        const server = startMockServer([
+        // Setup a server to mock the registry endpoint with 400 error
+        server = startMockServer([
             http.put(TOKENS_URL, async ({ request }) => {
                 const body = await request.json();
                 expect(body).toHaveProperty("jwt", EXPECTED_JWT);
@@ -109,18 +112,13 @@ describe("Main Action Tests", () => {
         await expect(main.run()).rejects.toThrowError(
             `Failed to retrieve token from Cargo registry. Status: 400. Response: {"errors":[{"detail":"No matching Trusted Publishing config found"}]}`,
         );
-        server.close();
-
-        // Reset MSW server handlers
-        server.resetHandlers();
     });
 
     test("should successfully retrieve and revoke token in happy path", async () => {
-        // Set up environment variable so we pass the permissions check
         setRegistryUrl();
 
-        // Setup MSW server to mock the registry endpoint with successful response
-        const server = startMockServer([
+        // Setup a server to mock the registry endpoint with successful response
+        server = startMockServer([
             http.put(TOKENS_URL, async ({ request }) => {
                 const body = await request.json();
                 expect(body).toHaveProperty("jwt", EXPECTED_JWT);
@@ -158,14 +156,10 @@ describe("Main Action Tests", () => {
 
         await post.cleanup();
         expect(core.info).toHaveBeenCalledWith("Token revoked successfully");
-
-        server.close();
-
-        // Reset MSW server handlers
-        server.resetHandlers();
     });
 });
 
+/** Set up environment variable to pass the permissions check */
 function setRegistryUrl(): void {
     // Set the registry URL in the environment variable
     process.env.ACTIONS_ID_TOKEN_REQUEST_URL = REGISTRY_URL;
