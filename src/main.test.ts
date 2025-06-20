@@ -1,6 +1,5 @@
 import { expect, test, vi, beforeEach, afterEach, describe } from "vitest";
 import { http, HttpResponse } from "msw";
-import * as msw from "msw/node";
 import * as main from "./main.js";
 import * as post from "./post.js";
 
@@ -18,6 +17,7 @@ vi.mock("@actions/core", () => ({
 
 // Import the mocked core module
 import * as core from "@actions/core";
+import { startMockServer } from "./test_utils.js";
 
 const AUDIENCE = "my-crates.io";
 const REGISTRY_URL = `https://${AUDIENCE}`;
@@ -89,7 +89,7 @@ describe("Main Action Tests", () => {
         setRegistryUrl();
 
         // Setup MSW server to mock the registry endpoint with 400 error
-        const handlers = [
+        const server = startMockServer([
             http.put(TOKENS_URL, async ({ request }) => {
                 const body = await request.json();
                 expect(body).toHaveProperty("jwt", EXPECTED_JWT);
@@ -104,9 +104,7 @@ describe("Main Action Tests", () => {
                     { status: 400 },
                 );
             }),
-        ];
-        const server = msw.setupServer(...handlers);
-        server.listen({ onUnhandledRequest: "error" });
+        ]);
 
         await expect(main.run()).rejects.toThrowError(
             `Failed to retrieve token from Cargo registry. Status: 400. Response: {"errors":[{"detail":"No matching Trusted Publishing config found"}]}`,
@@ -122,7 +120,7 @@ describe("Main Action Tests", () => {
         setRegistryUrl();
 
         // Setup MSW server to mock the registry endpoint with successful response
-        const handlers = [
+        const server = startMockServer([
             http.put(TOKENS_URL, async ({ request }) => {
                 const body = await request.json();
                 expect(body).toHaveProperty("jwt", EXPECTED_JWT);
@@ -137,9 +135,7 @@ describe("Main Action Tests", () => {
                 expect(authHeader).toBe(`Bearer ${EXPECTED_TOKEN}`);
                 return HttpResponse.json({}, { status: 204 });
             }),
-        ];
-        const server = msw.setupServer(...handlers);
-        server.listen({ onUnhandledRequest: "error" });
+        ]);
 
         // Run the main function
         await main.run();
