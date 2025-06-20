@@ -27280,12 +27280,6 @@ function runAction(fn) {
         coreExports.setFailed(`Error: ${errorMessage}`);
     });
 }
-function jsonContentType() {
-    return {
-        /* eslint-disable  @typescript-eslint/naming-convention */
-        "Content-Type": "application/json",
-    };
-}
 
 runAction(run);
 async function run() {
@@ -27323,7 +27317,10 @@ async function requestTrustedPublishingToken(registryUrl, jwtToken) {
     coreExports.info(`Requesting token from: ${tokenUrl}`);
     const response = await fetch(tokenUrl, {
         method: "PUT",
-        headers: jsonContentType(),
+        headers: {
+            /* eslint-disable  @typescript-eslint/naming-convention */
+            "Content-Type": "application/json",
+        },
         body: JSON.stringify({ jwt: jwtToken }),
     });
     if (!response.ok) {

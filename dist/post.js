@@ -27263,12 +27263,6 @@ function runAction(fn) {
         coreExports.setFailed(`Error: ${errorMessage}`);
     });
 }
-function jsonContentType() {
-    return {
-        /* eslint-disable  @typescript-eslint/naming-convention */
-        "Content-Type": "application/json",
-    };
-}
 
 runAction(cleanup);
 async function cleanup() {
@@ -27291,7 +27285,6 @@ async function revokeToken(registryUrl, token) {
     const response = await fetch(tokensEndpoint, {
         method: "DELETE",
         headers: {
-            ...jsonContentType(),
             /* eslint-disable  @typescript-eslint/naming-convention */
             Authorization: `Bearer ${token}`,
         },
@@ -27301,4 +27294,6 @@ async function revokeToken(registryUrl, token) {
     }
     coreExports.info("Token revoked successfully");
 }
+
+export { cleanup };
 //# sourceMappingURL=post.js.map

@@ -2,6 +2,7 @@ import { expect, test, vi, beforeEach, afterEach, describe } from "vitest";
 import { http, HttpResponse } from "msw";
 import * as msw from "msw/node";
 import * as main from "./main.js";
+import * as post from "./post.js";
 
 // Mock the @actions/core module
 vi.mock("@actions/core", () => ({
@@ -12,6 +13,7 @@ vi.mock("@actions/core", () => ({
     setFailed: vi.fn(),
     info: vi.fn(),
     saveState: vi.fn(),
+    getState: vi.fn(),
 }));
 
 // Import the mocked core module
@@ -20,9 +22,12 @@ import * as core from "@actions/core";
 const AUDIENCE = "my-crates.io";
 const REGISTRY_URL = `https://${AUDIENCE}`;
 const TOKENS_URL = `${REGISTRY_URL}/api/v1/trusted_publishing/tokens`;
+const EXPECTED_JWT = "mock-jwt-token";
+const EXPECTED_TOKEN = "cargo-registry-token";
 
 describe("Main Action Tests", () => {
     let originalEnvValue: string | undefined;
+    const state = new Map<string, string>();
 
     beforeEach(() => {
         // Reset all mocks before each test
@@ -36,12 +41,19 @@ describe("Main Action Tests", () => {
 
         // Setup default mock implementations
         vi.mocked(core.getInput).mockReturnValue(REGISTRY_URL); // Default registry URL
-        vi.mocked(core.getIDToken).mockResolvedValue("mock-jwt-token");
+        vi.mocked(core.getIDToken).mockResolvedValue(EXPECTED_JWT);
         vi.mocked(core.setOutput).mockImplementation(() => {});
         vi.mocked(core.setSecret).mockImplementation(() => {});
         vi.mocked(core.setFailed).mockImplementation(() => {});
         vi.mocked(core.info).mockImplementation(() => console.log);
-        vi.mocked(core.saveState).mockImplementation(() => {});
+        vi.mocked(core.saveState).mockImplementation(
+            (key: string, value: string) => {
+                state.set(key, value);
+            },
+        );
+        vi.mocked(core.getState).mockImplementation((key: string) => {
+            return state.get(key) ?? "";
+        });
     });
 
     afterEach(() => {
@@ -78,7 +90,9 @@ describe("Main Action Tests", () => {
 
         // Setup MSW server to mock the registry endpoint with 400 error
         const handlers = [
-            http.put(TOKENS_URL, () => {
+            http.put(TOKENS_URL, async ({ request }) => {
+                const body = await request.json();
+                expect(body).toHaveProperty("jwt", EXPECTED_JWT);
                 return HttpResponse.json(
                     {
                         errors: [
@@ -103,19 +117,25 @@ describe("Main Action Tests", () => {
         server.resetHandlers();
     });
 
-    test("should successfully retrieve token and save state in happy path", async () => {
+    test("should successfully retrieve and revoke token in happy path", async () => {
         // Set up environment variable so we pass the permissions check
         setRegistryUrl();
 
-        const expectedToken = "cargo-registry-token";
-
         // Setup MSW server to mock the registry endpoint with successful response
         const handlers = [
-            http.put(TOKENS_URL, () => {
+            http.put(TOKENS_URL, async ({ request }) => {
+                const body = await request.json();
+                expect(body).toHaveProperty("jwt", EXPECTED_JWT);
                 return HttpResponse.json(
-                    { token: expectedToken },
+                    { token: EXPECTED_TOKEN },
                     { status: 200 },
                 );
+            }),
+            http.delete(TOKENS_URL, ({ request }) => {
+                // Verify the Authorization header contains the token
+                const authHeader = request.headers.get("Authorization");
+                expect(authHeader).toBe(`Bearer ${EXPECTED_TOKEN}`);
+                return HttpResponse.json({}, { status: 204 });
             }),
         ];
         const server = msw.setupServer(...handlers);
@@ -125,13 +145,13 @@ describe("Main Action Tests", () => {
         await main.run();
 
         // Verify that setOutput was called with the token
-        expect(core.setOutput).toHaveBeenCalledWith("token", expectedToken);
+        expect(core.setOutput).toHaveBeenCalledWith("token", EXPECTED_TOKEN);
 
         // Verify that setSecret was called to mask the token in logs
-        expect(core.setSecret).toHaveBeenCalledWith(expectedToken);
+        expect(core.setSecret).toHaveBeenCalledWith(EXPECTED_TOKEN);
 
         // Verify that saveState was called with the correct token and registry URL
-        expect(core.saveState).toHaveBeenCalledWith("token", expectedToken);
+        expect(core.saveState).toHaveBeenCalledWith("token", EXPECTED_TOKEN);
         expect(core.saveState).toHaveBeenCalledWith(
             "registryUrl",
             REGISTRY_URL,
@@ -139,6 +159,9 @@ describe("Main Action Tests", () => {
 
         // Verify that getIDToken was called with the correct audience
         expect(core.getIDToken).toHaveBeenCalledWith(AUDIENCE);
+
+        await post.cleanup();
+        expect(core.info).toHaveBeenCalledWith("Token revoked successfully");
 
         server.close();
 
