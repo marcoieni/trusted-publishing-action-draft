@@ -118,7 +118,7 @@ describe("Main Action Tests", () => {
         setRegistryUrl();
 
         // Setup a server to mock the registry endpoint with successful response
-        const server = startMockServer([
+        server = startMockServer([
             http.put(TOKENS_URL, async ({ request }) => {
                 const body = await request.json();
                 expect(body).toHaveProperty("jwt", EXPECTED_JWT);
