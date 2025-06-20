@@ -1,14 +1,13 @@
 import * as core from "@actions/core";
 import {
     getTokensEndpoint,
-    jsonContentType,
     runAction,
     throwHttpErrorMessage,
 } from "./utils.js";
 
 runAction(cleanup);
 
-async function cleanup(): Promise<void> {
+export async function cleanup(): Promise<void> {
     // Retrieve the token and registry URL from the action state.
     // These values are set in the main job.
     const token = core.getState("token");
@@ -34,7 +33,6 @@ async function revokeToken(registryUrl: string, token: string): Promise<void> {
     const response = await fetch(tokensEndpoint, {
         method: "DELETE",
         headers: {
-            ...jsonContentType(),
             /* eslint-disable  @typescript-eslint/naming-convention */
             Authorization: `Bearer ${token}`,
         },

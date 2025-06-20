@@ -24,10 +24,3 @@ export function runAction(fn: () => Promise<void>): void {
         core.setFailed(`Error: ${errorMessage}`);
     });
 }
-
-export function jsonContentType() {
-    return {
-        /* eslint-disable  @typescript-eslint/naming-convention */
-        "Content-Type": "application/json",
-    };
-}
