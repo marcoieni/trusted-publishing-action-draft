@@ -1,6 +1,7 @@
 # trusted-publishing-action-draft
 
-Get a temporary access token that you can use to interact with crates.io.
+Get a temporary access token that you can use to interact with crates.io using
+[trusted publishing](https://rust-lang.github.io/rfcs/3691-trusted-publishing-cratesio.html).
 
 Remember:
 
